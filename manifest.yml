@@ -1,0 +1,442 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: userapp
+  name: userapp
+  namespace: finance-manager
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: userapp
+  template:
+    metadata:
+      labels:
+        app: userapp
+    spec:
+      containers:
+      - name: userapp
+        image: docker.io/widedreadnout/finance-manager-user
+        ports:
+          - containerPort: 8000
+        volumeMounts:
+          - name: secrets
+            mountPath: /app/secrets
+            readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: secret-order-appsettings
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: accountapp
+  name: accountapp
+  namespace: finance-manager
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: accountapp
+  template:
+    metadata:
+      labels:
+        app: accountapp
+    spec:
+      containers:
+      - name: accountapp
+        image: docker.io/widedreadnout/finance-manager-user
+        ports:
+          - containerPort: 8000
+        volumeMounts:
+          - name: secrets
+            mountPath: /app/secrets
+            readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: secret-order-appsettings
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: depositapp
+  name: depositapp
+  namespace: finance-manager
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: depositapp
+  template:
+    metadata:
+      labels:
+        app: depositapp
+    spec:
+      containers:
+      - name: depositapp
+        image: docker.io/widedreadnout/finance-manager-user
+        ports:
+          - containerPort: 8000
+        volumeMounts:
+          - name: secrets
+            mountPath: /app/secrets
+            readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: secret-order-appsettings
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: expenseapp
+  name: expenseapp
+  namespace: finance-manager
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: expenseapp
+  template:
+    metadata:
+      labels:
+        app: expenseapp
+    spec:
+      containers:
+      - name: expenseapp
+        image: docker.io/widedreadnout/finance-manager-user
+        ports:
+          - containerPort: 8000
+        volumeMounts:
+          - name: secrets
+            mountPath: /app/secrets
+            readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: secret-order-appsettings
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: transferapp
+  name: transferapp
+  namespace: finance-manager
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: transferapp
+  template:
+    metadata:
+      labels:
+        app: transferapp
+    spec:
+      containers:
+      - name: transferapp
+        image: docker.io/widedreadnout/finance-manager-user
+        ports:
+          - containerPort: 8000
+        volumeMounts:
+          - name: secrets
+            mountPath: /app/secrets
+            readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: secret-order-appsettings
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fileapp
+  name: fileapp
+  namespace: finance-manager
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fileapp
+  template:
+    metadata:
+      labels:
+        app: fileapp
+    spec:
+      containers:
+      - name: fileapp
+        image: docker.io/widedreadnout/finance-manager-user
+        ports:
+          - containerPort: 8000
+        volumeMounts:
+          - name: secrets
+            mountPath: /app/secrets
+            readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: secret-order-appsettings
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: notificationapp
+  name: notificationapp
+  namespace: finance-manager
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: notificationapp
+  template:
+    metadata:
+      labels:
+        app: notificationapp
+    spec:
+      containers:
+      - name: notificationapp
+        image: docker.io/widedreadnout/finance-manager-user
+        ports:
+          - containerPort: 8000
+        volumeMounts:
+          - name: secrets
+            mountPath: /app/secrets
+            readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: secret-order-appsettings
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: statisticsapp
+  name: statisticsapp
+  namespace: finance-manager
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: statisticsapp
+  template:
+    metadata:
+      labels:
+        app: statisticsapp
+    spec:
+      containers:
+      - name: statisticsapp
+        image: docker.io/widedreadnout/finance-manager-user
+        ports:
+          - containerPort: 8000
+        volumeMounts:
+          - name: secrets
+            mountPath: /app/secrets
+            readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: secret-order-appsettings
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: userapp-service
+  namespace: finance-manager
+  labels:
+    app: userapp
+    app.kubernetes.io/instance: userapp
+    app.kubernetes.io/name: userapp
+spec:
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+  selector:
+    app: userapp
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: accountsapp-service
+  namespace: finance-manager
+  labels:
+    app: accountsapp
+    app.kubernetes.io/instance: accountsapp
+    app.kubernetes.io/name: accountsapp
+spec:
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+  selector:
+    app: accountsapp
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: depositapp-service
+  namespace: finance-manager
+  labels:
+    app: depositapp
+    app.kubernetes.io/instance: depositapp
+    app.kubernetes.io/name: depositapp
+spec:
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+  selector:
+    app: depositapp
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: expenseapp-service
+  namespace: finance-manager
+  labels:
+    app: expenseapp
+    app.kubernetes.io/instance: expenseapp
+    app.kubernetes.io/name: expenseapp
+spec:
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+  selector:
+    app: expenseapp
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: transferapp-service
+  namespace: finance-manager
+  labels:
+    app: transferapp
+    app.kubernetes.io/instance: transferapp
+    app.kubernetes.io/name: transferapp
+spec:
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+  selector:
+    app: transferapp
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: fileapp-service
+  namespace: finance-manager
+  labels:
+    app: fileapp
+    app.kubernetes.io/instance: fileapp
+    app.kubernetes.io/name: fileapp
+spec:
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+  selector:
+    app: fileapp
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: notificationapp-service
+  namespace: finance-manager
+  labels:
+    app: notificationapp
+    app.kubernetes.io/instance: notificationapp
+    app.kubernetes.io/name: notificationapp
+spec:
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+  selector:
+    app: notificationapp
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: statisticsapp-service
+  namespace: finance-manager
+  labels:
+    app: statisticsapp
+    app.kubernetes.io/instance: statisticsapp
+    app.kubernetes.io/name: statisticsapp
+spec:
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+  selector:
+    app: statisticsapp
+  type: NodePort
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: userapp-ingress
+  namespace: finance-manager
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "arch.homework"
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: userapp-service
+              port:
+                number: 80

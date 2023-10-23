@@ -1,0 +1,21 @@
+﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+WORKDIR /app
+EXPOSE 8000
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+COPY ["FinanceManager.Deposit/FinanceManager.Deposit.csproj", "FinanceManager.Deposit/"]
+COPY ["FinanceManager.Events/FinanceManager.Events.csproj", "FinanceManager.Events/"]
+COPY ["FinanceManager.TransportLibrary/FinanceManager.TransportLibrary.csproj", "FinanceManager.TransportLibrary/"]
+RUN dotnet restore "FinanceManager.Deposit/FinanceManager.Deposit.csproj"
+COPY . .
+WORKDIR "/src/FinanceManager.Deposit"
+RUN dotnet build "FinanceManager.Deposit.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "FinanceManager.Deposit.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "FinanceManager.Deposit.dll"]

@@ -1,0 +1,5 @@
+fullnameOverride: cluster-rabbitmq
+
+rabbitmq:
+  usernmame: admin
+  password: admin
