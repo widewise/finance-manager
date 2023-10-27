@@ -1,0 +1,1815 @@
+{
+	"info": {
+		"_postman_id": "a739d7fd-21f8-4ab6-b6d2-d2b76de396e9",
+		"name": "FinanceManager",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "712846"
+	},
+	"item": [
+		{
+			"name": "Register user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check if user registered\", () => {\r",
+							"  pm.response.to.have.status(201);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.collectionVariables.set(\"user_email\", responseJson.email);\r",
+							"  pm.collectionVariables.set(\"user_name\", responseJson.username);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"let pass = pm.variables.replaceIn('{{$randomPassword}}');\r",
+							"pm.collectionVariables.set(\"user_password\", pass);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{$randomExampleEmail}}\",\r\n    \"username\": \"user_{{$randomUserName}}\",\r\n    \"password\": \"{{user_password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUserUrl}}/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"{{baseUserUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check if user logined and save auth token\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.collectionVariables.set(\"bearer_token\", responseJson.token);\r",
+							"  function parseJwt (token, part) {\r",
+							"    var base64Url = token.split('.')[part];\r",
+							"    var words = CryptoJS.enc.Base64.parse(base64Url);\r",
+							"    var jsonPayload = CryptoJS.enc.Utf8.stringify(words);\r",
+							"    return JSON.parse(jsonPayload);\r",
+							"  };\r",
+							"  const payload = parseJwt(responseJson.token, 1);\r",
+							"  const user_id = payload[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier\"];\r",
+							"  pm.collectionVariables.set(\"user_id\", user_id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{user_email}}\",\r\n  \"password\": \"{{user_password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUserUrl}}/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUserUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Currency",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check currency creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.collectionVariables.set(\"currency_id\", responseJson.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"shortName\": \"{{$randomCurrencyCode}}\",\r\n  \"name\": \"{{$randomCurrencyName}}\",\r\n  \"icon\": \"some_icon.jpg\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Currency",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Currency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Deposit Category",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check deposit category creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.collectionVariables.set(\"dep_category_id\", responseJson.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"deposit_cat_{{$guid}}\",\r\n  \"type\": 0,\r\n  \"parentId\": null,\r\n  \"description\": \"Test deposit category\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Category",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Category"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Expense Category",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check deposit category creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.collectionVariables.set(\"exp_category_id\", responseJson.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"expense_cat_{{$guid}}\",\r\n  \"type\": 1,\r\n  \"parentId\": null,\r\n  \"description\": \"Test_{{$guid}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Category",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Category"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Account 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check account 1 creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.collectionVariables.set(\"account_1_id\", responseJson.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"wallet_{{$guid}}\",\r\n  \"currencyId\": \"{{currency_id}}\",\r\n  \"icon\": \"wallet.jpg\",\r\n  \"description\": \"Test wallet\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Account",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Account 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check account 2 creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.collectionVariables.set(\"account_2_id\", responseJson.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"cash_{{$guid}}\",\r\n  \"currencyId\": \"{{currency_id}}\",\r\n  \"icon\": \"cash.jpg\",\r\n  \"description\": \"Test cash\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Account",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Deposit to Account 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check deposit creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"accountId\": \"{{account_1_id}}\",\r\n  \"categoryId\": \"{{dep_category_id}}\",\r\n  \"date\": \"{{$isoTimestamp}}\",\r\n  \"value\": 1000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseDepositUrl}}/api/Deposit",
+					"protocol": "http",
+					"host": [
+						"{{baseDepositUrl}}"
+					],
+					"path": [
+						"api",
+						"Deposit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Account 1 Balance deposit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check account 1 balance\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson[0].balance).eq(1000);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 100);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_1_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Account"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{account_1_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Expense from Account 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check expense creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"accountId\": \"{{account_1_id}}\",\r\n  \"categoryId\": \"{{exp_category_id}}\",\r\n  \"date\": \"{{$isoTimestamp}}\",\r\n  \"value\": 100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseExpenseUrl}}/api/Expense",
+					"protocol": "http",
+					"host": [
+						"{{baseExpenseUrl}}"
+					],
+					"path": [
+						"api",
+						"Expense"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Account 1 Balance expense",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check account 1 balance\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson[0].balance).eq(900);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 100);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_1_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Account"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{account_1_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Transfer from Account 1 to Account 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check transfer creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"fromAccountId\": \"{{account_1_id}}\",\r\n  \"toAccountId\": \"{{account_2_id}}\",\r\n  \"date\": \"{{$isoTimestamp}}\",\r\n  \"fromValue\": 300,\r\n  \"toValue\": 300,\r\n  \"description\": \"Transfer test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseTransferUrl}}/api/Transfer",
+					"protocol": "http",
+					"host": [
+						"{{baseTransferUrl}}"
+					],
+					"path": [
+						"api",
+						"Transfer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Account 1 Balance transfer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check account 1 balance\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson[0].balance).eq(600);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 100);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_1_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Account"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{account_1_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Account 2 Balance transfer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check account 1 balance\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson[0].balance).eq(300);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_2_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Account"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{account_2_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Fail Expense from Account 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check fail expense creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"    pm.collectionVariables.set(\"request_id\", pm.request.headers.get(\"x-request-id\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"accountId\": \"{{account_1_id}}\",\r\n  \"categoryId\": \"{{exp_category_id}}\",\r\n  \"date\": \"{{$isoTimestamp}}\",\r\n  \"value\": 1000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseExpenseUrl}}/api/Expense",
+					"protocol": "http",
+					"host": [
+						"{{baseExpenseUrl}}"
+					],
+					"path": [
+						"api",
+						"Expense"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Account 1 Balance not changed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check account 1 balance not changed\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson[0].balance).eq(600);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 100);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_1_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Account"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{account_1_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Expense Transaction Notifications",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check notification balance less zero\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson).not.eq(undefined);\r",
+							"  pm.expect(responseJson.body).eq('Account balance less zero');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseNotificationUrl}}/api/Notification/{{request_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseNotificationUrl}}"
+					],
+					"path": [
+						"api",
+						"Notification",
+						"{{request_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Fail Transfer from Account 1 to Account 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check fail transfer creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"      pm.collectionVariables.set(\"request_id\", pm.request.headers.get(\"x-request-id\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"fromAccountId\": \"{{account_1_id}}\",\r\n  \"toAccountId\": \"{{account_2_id}}\",\r\n  \"date\": \"{{$isoTimestamp}}\",\r\n  \"fromValue\": 1000,\r\n  \"toValue\": 1000,\r\n  \"description\": \"Fail transfer test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseTransferUrl}}/api/Transfer",
+					"protocol": "http",
+					"host": [
+						"{{baseTransferUrl}}"
+					],
+					"path": [
+						"api",
+						"Transfer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check  Account 1 Balance not changed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check account 1 balance not changed\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson[0].balance).eq(600);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 100);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_1_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Account"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{account_1_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Account 2 Balance not changed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check account 1 balance not changed\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson[0].balance).eq(300);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_2_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseAccountUrl}}"
+					],
+					"path": [
+						"api",
+						"Account"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{account_2_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Transfer Transaction Notifications",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check notification balance less zero\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson).not.eq(undefined);\r",
+							"  pm.expect(responseJson.body).eq('Account balance less zero');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseNotificationUrl}}/api/Notification/{{request_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseNotificationUrl}}"
+					],
+					"path": [
+						"api",
+						"Notification",
+						"{{request_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Import data session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check import session creation\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"      pm.collectionVariables.set(\"request_id\", pm.request.headers.get(\"x-request-id\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "formFile",
+							"type": "file",
+							"src": "/D:/Work/import_example.json"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{baseFileUrl}}/api/Import",
+					"protocol": "http",
+					"host": [
+						"{{baseFileUrl}}"
+					],
+					"path": [
+						"api",
+						"Import"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check imported deposits",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check imported deposits count\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.length).eq(3);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 10000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{request_id}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseDepositUrl}}/api/Deposit",
+					"protocol": "http",
+					"host": [
+						"{{baseDepositUrl}}"
+					],
+					"path": [
+						"api",
+						"Deposit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check imported expenses",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check imported expenses count\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.length).eq(7);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{request_id}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseExpenseUrl}}/api/Expense",
+					"protocol": "http",
+					"host": [
+						"{{baseExpenseUrl}}"
+					],
+					"path": [
+						"api",
+						"Expense"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check imported expenses Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check imported transfers count\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.length).eq(1);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{bearer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-request-id",
+						"value": "{{request_id}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseTransferUrl}}/api/Transfer",
+					"protocol": "http",
+					"host": [
+						"{{baseTransferUrl}}"
+					],
+					"path": [
+						"api",
+						"Transfer"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUserUrl",
+			"value": "localhost:5194",
+			"type": "string"
+		},
+		{
+			"key": "baseAccountUrl",
+			"value": "localhost:5166",
+			"type": "string"
+		},
+		{
+			"key": "baseDepositUrl",
+			"value": "localhost:5003",
+			"type": "string"
+		},
+		{
+			"key": "baseExpenseUrl",
+			"value": "localhost:5024",
+			"type": "string"
+		},
+		{
+			"key": "baseTransferUrl",
+			"value": "localhost:5033",
+			"type": "string"
+		},
+		{
+			"key": "baseNotificationUrl",
+			"value": "localhost:5213",
+			"type": "string"
+		},
+		{
+			"key": "request_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "bearer_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_password",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_email",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_name",
+			"value": ""
+		},
+		{
+			"key": "currency_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "dep_category_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "exp_category_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "account_1_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "account_2_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "baseFileUrl",
+			"value": "localhost:5121",
+			"type": "string"
+		}
+	]
+}

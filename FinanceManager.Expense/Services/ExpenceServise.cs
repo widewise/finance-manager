@@ -44,6 +44,11 @@ public class ExpenseService : IExpenseService
     public async Task<Models.Expense[]> GetAsync(ExpenseQueryParameters parameters)
     {
         var query = _appDbContext.Expenses.Where(x => true);
+        if (parameters.RequestId != null)
+        {
+            query = query.Where(x => x.RequestId == parameters.RequestId);
+        }
+
         if (parameters.Id.HasValue)
         {
             query = query.Where(x => x.Id == parameters.Id.Value);
