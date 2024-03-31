@@ -7,6 +7,8 @@ using FinanceManager.TransportLibrary;
 using FinanceManager.TransportLibrary.Models;
 using Microsoft.Extensions.Options;
 using RestSharp;
+using Polly;
+using Polly.CircuitBreaker;
 
 namespace FinanceManager.File.Services;
 
@@ -38,9 +40,12 @@ public interface IFinanceManagerRestClient
     Task RejectTransfersByTransactionIdAsync(string transactionId);
 }
 
-//TODO: add circuit breaker
 public class FinanceManagerRestClient : IFinanceManagerRestClient
 {
+    private const int ExeptionsAllowedBeforeBreaking = 3;
+    private static readonly TimeSpan BlockTimeout = TimeSpan.FromSeconds(30);
+    private readonly AsyncCircuitBreakerPolicy _restClientBreaker;
+
     private readonly ILogger<FinanceManagerRestClient> _logger;
     private readonly FinanceManagerSettings _settings;
     private readonly ApiKeySettings _apiKeySettings;
@@ -53,6 +58,19 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
         _logger = logger;
         _settings = settings.Value;
         _apiKeySettings = apiKeySettings.Value;
+        void OnBreak(Exception exception, TimeSpan timeSpan, Context context)
+        {
+            _logger.LogWarning(
+                "Circuit breaker for sending via REST client was break with error. Message: {ErrorMessage}",
+                exception.Message);
+        }
+
+        void OnReset(Context _) => _logger.LogInformation("Circuit breaker for sending via REST client");
+
+        _restClientBreaker = Policy
+            .Handle<WebException>()
+            .CircuitBreakerAsync(ExeptionsAllowedBeforeBreaking, BlockTimeout, OnBreak, OnReset);
+
     }
 
     public Task<Account[]> GetAccountsByTransactionIdAsync(long? userId, string? transactionId)
@@ -253,7 +271,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
           restRequest.AddJsonBody(bodyObject);
       }
       Stopwatch stopwatch = Stopwatch.StartNew();
-      var restResponse = await restClient.ExecuteAsync(restRequest);
+      var restResponse = await _restClientBreaker.ExecuteAsync(async () => await restClient.ExecuteAsync(restRequest));
       stopwatch.Stop();
       if (restResponse.IsSuccessful)
       {
