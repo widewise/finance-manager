@@ -1,5 +1,8 @@
-﻿using FinanceManager.Account.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using FinanceManager.Account.Domain;
+using FinanceManager.Account.Models;
+using FinanceManager.Account.Repositories;
+using FinanceManager.UnitOfWork.EntityFramework.Abstracts;
 
 namespace FinanceManager.Account.Services;
 
@@ -18,31 +21,29 @@ public interface ICurrencyService
 public class CurrencyService: ICurrencyService
 {
     private readonly ILogger<CurrencyService> _logger;
-    private readonly AppDbContext _appDbContext;
+    private readonly IMapper _mapper;
+    private readonly ICurrencyRepository _currencyRepository;
+    private readonly IAccountRepository _accountRepository;
+    private readonly IUnitOfWorkExecuter _unitOfWorkExecuter;
 
     public CurrencyService(
         ILogger<CurrencyService> logger,
-        AppDbContext appDbContext)
+        IMapper mapper,
+        ICurrencyRepository currencyRepository,
+        IAccountRepository accountRepository,
+        IUnitOfWorkExecuter unitOfWorkExecuter)
     {
         _logger = logger;
-        _appDbContext = appDbContext;
+        _mapper = mapper;
+        _currencyRepository = currencyRepository;
+        _accountRepository = accountRepository;
+        _unitOfWorkExecuter = unitOfWorkExecuter;
     }
 
     public async Task<Currency[]> GetAsync(CurrencyQueryParameters parameters)
     {
-        var query = _appDbContext.Currencies.Where(x => true);
-
-        if (parameters.UserId.HasValue)
-        {
-            query = query.Where(x => x.UserId == parameters.UserId.Value);
-        }
-
-        if (parameters.RequestId != null)
-        {
-            query = query.Where(x => x.RequestId == parameters.RequestId);
-        }
-            
-        return await query.ToArrayAsync();
+        var specification = _mapper.Map<CurrencySpecification>(parameters);
+        return await _currencyRepository.GetAsync(specification);
     }
 
     public async Task<Currency?> CreateAsync(
@@ -50,7 +51,7 @@ public class CurrencyService: ICurrencyService
         long userId,
         CreateCurrencyModel model)
     {
-        if (await _appDbContext.Currencies.AnyAsync(x => x.RequestId == requestId))
+        if (await _currencyRepository.CheckExistAsync(new CurrencySpecification(requestId: requestId)))
         {
             _logger.LogWarning(
                 "Currency has already created for request with id {RequestId}",
@@ -58,8 +59,7 @@ public class CurrencyService: ICurrencyService
             return null;
         }
 
-        if (await _appDbContext.Currencies.AnyAsync(
-                x => x.Name == model.Name && x.UserId == userId))
+        if (await _currencyRepository.CheckExistAsync(new CurrencySpecification(userId: userId, name: model.Name)))
         {
             _logger.LogWarning(
                 "Currency with name {Name} has already created",
@@ -67,19 +67,10 @@ public class CurrencyService: ICurrencyService
             return null;
         }
 
-        var created = await _appDbContext.AddAsync(new Currency
-        {
-            Id = Guid.NewGuid(),
-            RequestId = requestId,
-            UserId = userId,
-            Name = model.Name,
-            ShortName = model.ShortName,
-            Icon = model.Icon,
-        });
-        
-        await _appDbContext.SaveChangesAsync();
+        var created = await _unitOfWorkExecuter.ExecuteAsync<ICurrencyRepository, Currency>(
+            repo => repo.CreateAsync(requestId, userId, model.Name, model.ShortName, model.Icon));
 
-        return created.Entity;
+        return created;
     }
 
     public async Task<Currency[]?> BulkCreateAsync(
@@ -87,7 +78,7 @@ public class CurrencyService: ICurrencyService
         long userId,
         string requestId)
     {
-        if (await _appDbContext.Currencies.AnyAsync(x => x.RequestId == requestId))
+        if (await _currencyRepository.CheckExistAsync(new CurrencySpecification(requestId: requestId)))
         {
             _logger.LogWarning(
                 "Currencies has already created for request with id {RequestId}",
@@ -105,15 +96,15 @@ public class CurrencyService: ICurrencyService
             Icon = model.Icon,
         }).ToArray();
 
-        await _appDbContext.BulkInsertAsync(newEntities);
-        await _appDbContext.BulkSaveChangesAsync();
+        await _unitOfWorkExecuter.ExecuteAsync<ICurrencyRepository>(
+            repo => repo.BulkCreateAsync(newEntities));
 
         return newEntities;
     }
 
     public async Task<bool> DeleteAsync(Guid id, long userId)
     {
-        var existed = await _appDbContext.Currencies.FirstOrDefaultAsync(x => x.Id == id);
+        var existed = (await _currencyRepository.GetAsync(new CurrencySpecification(id: id))).FirstOrDefault();
         if (existed == null)
         {
             _logger.LogWarning("Category with id {d} is not found", id);
@@ -126,28 +117,27 @@ public class CurrencyService: ICurrencyService
             return false;
         }
 
-        if (await _appDbContext.Accounts.AnyAsync(x => x.CurrencyId == id))
+        if (await _accountRepository.CheckExistAsync(new AccountSpecification(currencyId: id)))
         {
             _logger.LogWarning("There are accounts with currency with id {Id}", id);
             return false;
         }
 
-        _appDbContext.Currencies.Remove(existed);
-        await _appDbContext.SaveChangesAsync();
+        await _unitOfWorkExecuter.ExecuteAsync<ICurrencyRepository>(
+            repo => repo.DeleteAsync(existed));
+
         return true;
     }
 
     public async Task RejectAsync(string requestId)
     {
-        var currencies = await _appDbContext.Currencies
-            .Where(x => x.RequestId == requestId)
-            .ToArrayAsync();
+        var currencies = await _currencyRepository.GetAsync(new CurrencySpecification(requestId: requestId));
         if (!currencies.Any())
         {
             return;
         }
 
-        _appDbContext.Currencies.RemoveRange(currencies);
-        await _appDbContext.SaveChangesAsync();
+        await _unitOfWorkExecuter.ExecuteAsync<ICurrencyRepository>(
+            repo => repo.BulkDeleteAsync(currencies));
     }
 }

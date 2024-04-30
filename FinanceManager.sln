@@ -22,6 +22,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManager.Transfer", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManager.Notification", "FinanceManager.Notification\FinanceManager.Notification.csproj", "{A9EFF401-67DD-44BD-9ABB-B0D763BE8E51}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManager.UnitOfWork", "FinanceManager.UnitOfWork\FinanceManager.UnitOfWork.csproj", "{217EEBA6-E185-4CC1-9A29-984A10FFC24C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C832224C-045F-44B9-90FE-020583EC1A0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManager.Account.Tests", "FinanceManager.Account.Tests\FinanceManager.Account.Tests.csproj", "{7E24C4CF-E361-4A08-AD79-A49D65E8A02C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,9 +74,19 @@ Global
 		{A9EFF401-67DD-44BD-9ABB-B0D763BE8E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9EFF401-67DD-44BD-9ABB-B0D763BE8E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9EFF401-67DD-44BD-9ABB-B0D763BE8E51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{217EEBA6-E185-4CC1-9A29-984A10FFC24C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{217EEBA6-E185-4CC1-9A29-984A10FFC24C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{217EEBA6-E185-4CC1-9A29-984A10FFC24C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{217EEBA6-E185-4CC1-9A29-984A10FFC24C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E24C4CF-E361-4A08-AD79-A49D65E8A02C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E24C4CF-E361-4A08-AD79-A49D65E8A02C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E24C4CF-E361-4A08-AD79-A49D65E8A02C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E24C4CF-E361-4A08-AD79-A49D65E8A02C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{69D646B1-8A67-4F01-B2EF-171E7757C722} = {750AEA14-6550-460C-A5C2-900478318486}
 		{41959E4A-428B-43DB-8733-434E1234A488} = {750AEA14-6550-460C-A5C2-900478318486}
+		{217EEBA6-E185-4CC1-9A29-984A10FFC24C} = {750AEA14-6550-460C-A5C2-900478318486}
+		{7E24C4CF-E361-4A08-AD79-A49D65E8A02C} = {C832224C-045F-44B9-90FE-020583EC1A0E}
 	EndGlobalSection
 EndGlobal

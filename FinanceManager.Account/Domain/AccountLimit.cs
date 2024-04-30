@@ -1,4 +1,4 @@
-﻿namespace FinanceManager.Account.Models;
+﻿namespace FinanceManager.Account.Domain;
 
 public class AccountLimit
 {
@@ -9,6 +9,8 @@ public class AccountLimit
     public AccountLimitType Type { get; set; }
     public AccountLimitTime Time { get; set; }
     public string? Description { get; set; }
+    public bool IsNotification => Type == AccountLimitType.Notify;
+    public bool IsRestriction => Type == AccountLimitType.Restrict;
 }
 
 public enum AccountLimitType

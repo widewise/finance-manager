@@ -1,4 +1,6 @@
-﻿namespace FinanceManager.Account.Models;
+﻿using FinanceManager.Account.Domain;
+
+namespace FinanceManager.Account.Models;
 
 public class CreateCategoryModel
 {
