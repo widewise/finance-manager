@@ -8,9 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinanceManager.Account.Controllers;
 
 [Authorize]
-[ApiController]
 [Route("api/[controller]")]
-public class AccountLimitController : ControllerBase
+public class AccountLimitController : BaseController
 {
     private readonly IAccountLimitService _accountLimitService;
 
@@ -51,5 +50,14 @@ public class AccountLimitController : ControllerBase
     {
         var res = await _accountLimitService.DeleteAsync(id);
         return res ? Ok() : BadRequest();
+    }
+    
+    [HttpOptions]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [AllowAnonymous]
+    public IActionResult DocumentsOptions()
+    {
+        AddAllowHeader();
+        return Ok();
     }
 }

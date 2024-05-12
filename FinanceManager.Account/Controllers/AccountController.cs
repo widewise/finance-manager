@@ -9,9 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.Account.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class AccountController : ControllerBase
+public class AccountController : BaseController
 {
     private readonly ILogger<AccountController> _logger;
     private readonly IAccountService _accountService;
@@ -113,6 +112,15 @@ public class AccountController : ControllerBase
         [FromHeader(Name = HttpHeaderKeys.RequestId)] [Required] string requestId)
     {
         await _accountService.RejectAsync(requestId);
+        return Ok();
+    }
+
+    [HttpOptions]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [AllowAnonymous]
+    public IActionResult DocumentsOptions()
+    {
+        AddAllowHeader();
         return Ok();
     }
 }

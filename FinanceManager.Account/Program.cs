@@ -64,6 +64,9 @@ builder.Services.AddTransportConsumerWithReject<TransferBetweenAccountsEvent, Tr
     EventConstants.AccountExchange,
     EventConstants.TransferBetweenAccountsEvent);
 
+builder.Services.AddScoped<ILinkService, LinkService>();
+builder.Services.AddHttpContextAccessor();
+
 IdentityModelEventSource.ShowPII = true;
 var app = builder.Build();
 app.Services.BuildTransportMap();

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FinanceManager.Account.Domain;
 using FinanceManager.Account.Models;
 using FinanceManager.Account.Repositories;
 
@@ -11,5 +12,7 @@ public class MappingProfile : Profile
         CreateMap<CurrencyQueryParameters, CurrencySpecification>();
         CreateMap<CategoryQueryParameters, CategorySpecification>();
         CreateMap<AccountQueryParameters, AccountSpecification>();
+        CreateMap<Currency, CurrencyResponse>();
+        CreateMap<Category, CategoryResponse>();
     }
 }

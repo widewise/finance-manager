@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper;
+using FinanceManager.Account.Domain;
 using FinanceManager.Account.Models;
 using FinanceManager.Account.Services;
 using FinanceManager.TransportLibrary;
@@ -9,23 +11,28 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.Account.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class CategoryController : ControllerBase
+public class CategoryController : BaseController
 {
     private readonly ILogger<CategoryController> _logger;
     private readonly ICategoryService _categoryService;
+    private readonly IMapper _mapper;
+    private readonly ILinkService _linkService;
 
     public CategoryController(
         ILogger<CategoryController> logger,
-        ICategoryService categoryService)
+        ICategoryService categoryService,
+        IMapper mapper,
+        ILinkService linkService)
     {
         _logger = logger;
         _categoryService = categoryService;
+        _mapper = mapper;
+        _linkService = linkService;
     }
     
     [Authorize]
-    [HttpGet]
+    [HttpGet(Name = ApiNameConstants.GetCategory)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(
         [FromHeader(Name = HttpHeaderKeys.RequestId)] string? requestId,
@@ -37,16 +44,18 @@ public class CategoryController : ControllerBase
             return BadRequest("The current user identifier is not set");
         }
 
-        return Ok(await _categoryService.GetAsync(new CategoryQueryParameters
+        var categories = await _categoryService.GetAsync(new CategoryQueryParameters
         {
             RequestId = requestId,
             UserId = currentUserId,
             ParentId = parentId
-        }));
+        });
+
+        return Ok(categories.Select(GetResponse));
     }
 
     [ApiKey]
-    [HttpGet("internal")]
+    [HttpGet("internal", Name = ApiNameConstants.GetInternalCategory)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetInternal(
         [FromHeader(Name = HttpHeaderKeys.RequestId)] string? requestId,
@@ -62,8 +71,8 @@ public class CategoryController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpPost(Name = ApiNameConstants.CreateCategory)]
+    [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(
         [FromHeader(Name = HttpHeaderKeys.RequestId)][Required] string requestId,
         [FromBody] CreateCategoryModel model)
@@ -74,11 +83,18 @@ public class CategoryController : ControllerBase
             return BadRequest("The current user identifier is not set");
         }
 
-        return Ok(await _categoryService.CreateAsync(model, currentUserId, requestId));
+        var category = await _categoryService.CreateAsync(model, currentUserId, requestId);
+        if (category == null)
+        {
+            return BadRequest();
+        }
+
+        var response = GetResponse(category);
+        return Created(response.Links.FirstOrDefault()?.Href ?? string.Empty, response);
     }
 
     [ApiKey]
-    [HttpPost("{userId}/bulk")]
+    [HttpPost("{userId}/bulk", Name = ApiNameConstants.BulkCreateCategories)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> BulkCreate(
         [FromHeader(Name = HttpHeaderKeys.RequestId)][Required] string requestId,
@@ -89,7 +105,7 @@ public class CategoryController : ControllerBase
     }
 
     [Authorize]
-    [HttpDelete("{id}")]
+    [HttpDelete("{id}", Name = ApiNameConstants.DeleteCategory)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
@@ -98,12 +114,44 @@ public class CategoryController : ControllerBase
     }
 
     [ApiKey]
-    [HttpDelete]
+    [HttpDelete(Name = ApiNameConstants.RejectCategories)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Reject(
         [FromHeader(Name = HttpHeaderKeys.RequestId)] [Required] string requestId)
     {
         await _categoryService.RejectAsync(requestId);
         return Ok();
+    }
+    
+    [HttpOptions]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [AllowAnonymous]
+    public IActionResult DocumentsOptions()
+    {
+        AddAllowHeader();
+        return Ok();
+    }
+        
+    private CategoryResponse GetResponse(Category category)
+    {
+        var response = _mapper.Map<CategoryResponse>(category);
+        var id = response.Id;
+        var parentId = response.ParentId;
+        var links = new List<Link>();
+
+        links.Add(_linkService.Generate(
+            ApiNameConstants.GetCategory,
+            new { parentId },
+            ApiNameConstants.Self,
+            HttpMethod.Get.Method));
+
+        links.Add(_linkService.Generate(
+            ApiNameConstants.DeleteCategory,
+            new { id },
+            ApiNameConstants.DeleteCategoryRel,
+            HttpMethod.Delete.Method));
+
+        response.Links = links.ToArray();
+        return response;
     }
 }
