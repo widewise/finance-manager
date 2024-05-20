@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using AutoMapper;
 using FinanceManager.Account.Domain;
 using FinanceManager.Account.Models;
@@ -11,7 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.Account.Controllers;
 
-[Route("api/[controller]")]
+[ApiVersion(1.0)]
+[Route("api/v{v:apiVersion}/currencies")]
 public class CurrencyController : BaseController
 {
     private readonly ILogger<CurrencyController> _logger;

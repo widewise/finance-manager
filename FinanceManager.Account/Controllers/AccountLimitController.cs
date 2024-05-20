@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using FinanceManager.Account.Models;
 using FinanceManager.Account.Services;
 using FinanceManager.TransportLibrary;
@@ -8,7 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinanceManager.Account.Controllers;
 
 [Authorize]
-[Route("api/[controller]")]
+[ApiVersion(1.0)]
+[Route("api/v{v:apiVersion}/accounts/limits")]
 public class AccountLimitController : BaseController
 {
     private readonly IAccountLimitService _accountLimitService;

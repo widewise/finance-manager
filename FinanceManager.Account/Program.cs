@@ -1,8 +1,12 @@
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Conventions;
 using FinanceManager.Account;
 using FinanceManager.Account.Consumers;
 using FinanceManager.Account.Mapping;
 using FinanceManager.Account.Repositories;
 using FinanceManager.Account.Services;
+using FinanceManager.Account.Swagger;
 using FinanceManager.Events;
 using FinanceManager.Events.Models;
 using FinanceManager.TransportLibrary;
@@ -29,9 +33,25 @@ builder.Services.AddTransient<ICategoryService, CategoryService>();
 builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 
 builder.Services.AddControllers();
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1.0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+})
+    .AddMvc(
+        options =>
+        {
+            // automatically applies an api version based on the name of
+            // the defining controller's namespace
+            options.Conventions.Add(new VersionByNamespaceConvention());
+        })
+    .AddApiExplorer();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.ConfigureOptions<NamedSwaggerGenOptions>();
+
 
 var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (dbConnectionString != null)
@@ -90,8 +110,18 @@ if (dbConnectionString != null)
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                $"v{description.GroupName.ToUpperInvariant()}");
+        }
+        options.RoutePrefix = string.Empty;
+    });
 }
 
 app.UseExceptionHandler(a => a.AddDefaultExceptionHandler(logger));
