@@ -1,11 +1,9 @@
-﻿using FinanceManager.TransportLibrary.Models;
-using FinanceManager.TransportLibrary.Services;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Authentication;
-namespace FinanceManager.TransportLibrary.Extensions;
+
+namespace FinanceManager.Web.Extensions;
 
 public static class ApplicationBuilderExtensions
 {

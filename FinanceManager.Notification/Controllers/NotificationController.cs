@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,8 @@ namespace FinanceManager.Notification.Controllers;
 
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion(1.0)]
+[Route("api/v{v:apiVersion}/notifications")]
 public class NotificationController : ControllerBase
 {
     private readonly ILogger<NotificationController> _logger;

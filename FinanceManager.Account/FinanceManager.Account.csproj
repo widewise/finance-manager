@@ -35,6 +35,7 @@
       <ProjectReference Include="..\FinanceManager.Events\FinanceManager.Events.csproj" />
       <ProjectReference Include="..\FinanceManager.TransportLibrary\FinanceManager.TransportLibrary.csproj" />
       <ProjectReference Include="..\FinanceManager.UnitOfWork\FinanceManager.UnitOfWork.csproj" />
+      <ProjectReference Include="..\FinanceManager.Web\FinanceManager.Web.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,4 @@
-﻿namespace FinanceManager.TransportLibrary;
+﻿namespace FinanceManager.Web;
 
 /// <summary>
 /// Represents header keys

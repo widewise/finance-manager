@@ -1,20 +1,25 @@
-﻿using Asp.Versioning.ApiExplorer;
+﻿using System.Diagnostics;
+using Asp.Versioning.ApiExplorer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace FinanceManager.Account.Swagger;
+namespace FinanceManager.Web.Swagger;
 
-public class NamedSwaggerGenOptions : IConfigureNamedOptions<SwaggerGenOptions>
+public class NamedSwaggerGenOptions<TEntryPoint> : IConfigureNamedOptions<SwaggerGenOptions>
 {
     private readonly IApiVersionDescriptionProvider _provider;
-    private static readonly string? VersionString = System.Diagnostics.FileVersionInfo.GetVersionInfo(typeof(Program).Assembly.Location).FileVersion;
+    private readonly string? _versionString;
+    private readonly string? _apiName;
 
     public NamedSwaggerGenOptions(IApiVersionDescriptionProvider provider)
     {
+        var info = FileVersionInfo.GetVersionInfo(typeof(TEntryPoint).Assembly.Location);
+        _versionString = info.FileVersion;
+        _apiName = info.ProductName;
         _provider = provider;
     }
-    
 
     public void Configure(string? name, SwaggerGenOptions options)
     {
@@ -35,11 +40,10 @@ public class NamedSwaggerGenOptions : IConfigureNamedOptions<SwaggerGenOptions>
     private OpenApiInfo CreateVersionInfo(
         ApiVersionDescription description)
     {
-
         var info = new OpenApiInfo
         {
-            Title = $"Account API v{description.GroupName}",
-            Version = VersionString
+            Title = $"{_apiName} API v{description.GroupName}",
+            Version = _versionString
         };
 
         if (description.IsDeprecated)

@@ -1,4 +1,5 @@
-﻿using FinanceManager.User.Models;
+﻿using Asp.Versioning;
+using FinanceManager.User.Models;
 using FinanceManager.User.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinanceManager.User.Controllers;
 
 [ApiController]
-[Route("api/auth")]
+[ApiVersion(1.0)]
+[Route("api/v{v:apiVersion}/auth")]
 public class ApiAuthController : ControllerBase
 {
     private readonly ILogger<ApiAuthController> _logger;

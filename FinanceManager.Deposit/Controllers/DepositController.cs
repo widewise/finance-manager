@@ -1,16 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using FinanceManager.Deposit.Models;
 using FinanceManager.Deposit.Services;
-using FinanceManager.TransportLibrary;
-using FinanceManager.TransportLibrary.Extensions;
-using FinanceManager.TransportLibrary.Services;
+using FinanceManager.Web;
+using FinanceManager.Web.Extensions;
+using FinanceManager.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.Deposit.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion(1.0)]
+[Route("api/v{v:apiVersion}/deposits")]
 public class DepositController : ControllerBase
 {
     private readonly ILogger<DepositController> _logger;

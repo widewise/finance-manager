@@ -1,6 +1,6 @@
-﻿using FinanceManager.TransportLibrary.Models;
+﻿using FinanceManager.Web.Models;
 
-namespace FinanceManager.TransportLibrary.Services;
+namespace FinanceManager.Web.Services;
 
 public interface IApiKeyValidator
 {

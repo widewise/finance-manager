@@ -1,16 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using FinanceManager.Transfer.Models;
 using FinanceManager.Transfer.Services;
-using FinanceManager.TransportLibrary;
-using FinanceManager.TransportLibrary.Extensions;
-using FinanceManager.TransportLibrary.Services;
+using FinanceManager.Web;
+using FinanceManager.Web.Extensions;
+using FinanceManager.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.Transfer.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion(1.0)]
+[Route("api/v{v:apiVersion}/transfers")]
 public class TransferController : ControllerBase
 {
     private readonly ILogger<TransferController> _logger;

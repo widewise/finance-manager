@@ -3,8 +3,8 @@ using System.Net;
 using System.Text.Json;
 using FinanceManager.File.Models;
 using FinanceManager.File.Models.External;
-using FinanceManager.TransportLibrary;
-using FinanceManager.TransportLibrary.Models;
+using FinanceManager.Web;
+using FinanceManager.Web.Models;
 using Microsoft.Extensions.Options;
 using RestSharp;
 using Polly;
@@ -167,7 +167,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Deposit[]>(
             _settings.DepositServiceBaseUrl,
-            $"api/deposit/internal?userId={userId}",
+            $"api/v1/deposits/internal?userId={userId}",
             transactionId);
     }
 
@@ -175,7 +175,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync(
             _settings.DepositServiceBaseUrl,
-            "api/deposit",
+            "api/v1/deposits",
             transactionId,
             Method.Delete);
     }
@@ -184,7 +184,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Expense[]>(
             _settings.ExpenseServiceBaseUrl,
-            $"api/expense/internal?userId={userId}",
+            $"api/v1/expenses/internal?userId={userId}",
             transactionId);
     }
 
@@ -192,7 +192,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync(
             _settings.ExpenseServiceBaseUrl,
-            "api/expense",
+            "api/v1/expenses",
             transactionId,
             Method.Delete);
     }
@@ -201,7 +201,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Transfer[]>(
             _settings.TransferServiceBaseUrl,
-            $"api/transfer/internal?userId={userId}",
+            $"api/v1/transfers/internal?userId={userId}",
             transactionId);
     }
 
@@ -209,7 +209,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync(
             _settings.TransferServiceBaseUrl,
-            "api/transfer",
+            "api/v1/transfers",
             transactionId,
             Method.Delete);
     }

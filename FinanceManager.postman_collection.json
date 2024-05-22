@@ -20,7 +20,8 @@
 							"  pm.collectionVariables.set(\"user_name\", responseJson.username);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -32,7 +33,8 @@
 							"pm.collectionVariables.set(\"user_password\", pass);\r",
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -49,13 +51,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUserUrl}}/api/auth/register",
+					"raw": "http://{{baseUserUrl}}/api/v1/auth/register",
 					"protocol": "http",
 					"host": [
 						"{{baseUserUrl}}"
 					],
 					"path": [
 						"api",
+						"v1",
 						"auth",
 						"register"
 					]
@@ -85,7 +88,8 @@
 							"  pm.collectionVariables.set(\"user_id\", user_id);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -102,13 +106,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseUserUrl}}/api/auth/login",
+					"raw": "http://{{baseUserUrl}}/api/v1/auth/login",
 					"protocol": "http",
 					"host": [
 						"{{baseUserUrl}}"
 					],
 					"path": [
 						"api",
+						"v1",
 						"auth",
 						"login"
 					]
@@ -124,12 +129,13 @@
 					"script": {
 						"exec": [
 							"pm.test(\"Check currency creation\", () => {\r",
-							"  pm.response.to.have.status(200);\r",
+							"  pm.response.to.have.status(201);\r",
 							"  const responseJson = pm.response.json();\r",
 							"  pm.collectionVariables.set(\"currency_id\", responseJson.id);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -138,7 +144,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -157,8 +164,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -171,14 +177,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Currency",
+					"raw": "http://{{baseAccountUrl}}/api/v1/currencies",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Currency"
+						"v1",
+						"currencies"
 					]
 				}
 			},
@@ -192,12 +199,13 @@
 					"script": {
 						"exec": [
 							"pm.test(\"Check deposit category creation\", () => {\r",
-							"  pm.response.to.have.status(200);\r",
+							"  pm.response.to.have.status(201);\r",
 							"  const responseJson = pm.response.json();\r",
 							"  pm.collectionVariables.set(\"dep_category_id\", responseJson.id);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -206,7 +214,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -225,8 +234,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -239,14 +247,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Category",
+					"raw": "http://{{baseAccountUrl}}/api/v1/categories",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Category"
+						"v1",
+						"categories"
 					]
 				}
 			},
@@ -260,12 +269,13 @@
 					"script": {
 						"exec": [
 							"pm.test(\"Check deposit category creation\", () => {\r",
-							"  pm.response.to.have.status(200);\r",
+							"  pm.response.to.have.status(201);\r",
 							"  const responseJson = pm.response.json();\r",
 							"  pm.collectionVariables.set(\"exp_category_id\", responseJson.id);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -274,7 +284,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -293,8 +304,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -307,14 +317,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Category",
+					"raw": "http://{{baseAccountUrl}}/api/v1/categories",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Category"
+						"v1",
+						"categories"
 					]
 				}
 			},
@@ -333,7 +344,8 @@
 							"  pm.collectionVariables.set(\"account_1_id\", responseJson.id);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -342,7 +354,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -361,8 +374,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -375,14 +387,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Account",
+					"raw": "http://{{baseAccountUrl}}/api/v1/accounts",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Account"
+						"v1",
+						"accounts"
 					]
 				}
 			},
@@ -401,7 +414,8 @@
 							"  pm.collectionVariables.set(\"account_2_id\", responseJson.id);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -410,7 +424,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -429,8 +444,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -443,14 +457,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Account",
+					"raw": "http://{{baseAccountUrl}}/api/v1/accounts",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Account"
+						"v1",
+						"accounts"
 					]
 				}
 			},
@@ -467,7 +482,8 @@
 							"  pm.response.to.have.status(200);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -476,7 +492,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -495,8 +512,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -509,14 +525,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseDepositUrl}}/api/Deposit",
+					"raw": "http://{{baseDepositUrl}}/api/v1/deposits",
 					"protocol": "http",
 					"host": [
 						"{{baseDepositUrl}}"
 					],
 					"path": [
 						"api",
-						"Deposit"
+						"v1",
+						"deposits"
 					]
 				}
 			},
@@ -535,7 +552,8 @@
 							"  pm.expect(responseJson[0].balance).eq(1000);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -544,7 +562,8 @@
 						"exec": [
 							"setTimeout(function(){}, 100);"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -574,14 +593,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_1_id}}",
+					"raw": "http://{{baseAccountUrl}}/api/v1/accounts?id={{account_1_id}}",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Account"
+						"v1",
+						"accounts"
 					],
 					"query": [
 						{
@@ -604,7 +624,8 @@
 							"  pm.response.to.have.status(200);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -613,7 +634,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -632,8 +654,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -646,14 +667,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseExpenseUrl}}/api/Expense",
+					"raw": "http://{{baseExpenseUrl}}/api/v1/expenses",
 					"protocol": "http",
 					"host": [
 						"{{baseExpenseUrl}}"
 					],
 					"path": [
 						"api",
-						"Expense"
+						"v1",
+						"expenses"
 					]
 				}
 			},
@@ -672,7 +694,8 @@
 							"  pm.expect(responseJson[0].balance).eq(900);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -681,7 +704,8 @@
 						"exec": [
 							"setTimeout(function(){}, 100);"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -711,14 +735,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_1_id}}",
+					"raw": "http://{{baseAccountUrl}}/api/v1/accounts?id={{account_1_id}}",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Account"
+						"v1",
+						"accounts"
 					],
 					"query": [
 						{
@@ -741,7 +766,8 @@
 							"  pm.response.to.have.status(200);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -750,7 +776,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -769,8 +796,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -783,14 +809,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseTransferUrl}}/api/Transfer",
+					"raw": "http://{{baseTransferUrl}}/api/v1/transfers",
 					"protocol": "http",
 					"host": [
 						"{{baseTransferUrl}}"
 					],
 					"path": [
 						"api",
-						"Transfer"
+						"v1",
+						"transfers"
 					]
 				}
 			},
@@ -809,7 +836,8 @@
 							"  pm.expect(responseJson[0].balance).eq(600);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -818,7 +846,8 @@
 						"exec": [
 							"setTimeout(function(){}, 100);"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -848,14 +877,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_1_id}}",
+					"raw": "http://{{baseAccountUrl}}/api/v1/accounts?id={{account_1_id}}",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Account"
+						"v1",
+						"accounts"
 					],
 					"query": [
 						{
@@ -880,7 +910,8 @@
 							"  pm.expect(responseJson[0].balance).eq(300);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -889,7 +920,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -919,14 +951,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_2_id}}",
+					"raw": "http://{{baseAccountUrl}}/api/v1/accounts?id={{account_2_id}}",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Account"
+						"v1",
+						"accounts"
 					],
 					"query": [
 						{
@@ -950,7 +983,8 @@
 							"    pm.collectionVariables.set(\"request_id\", pm.request.headers.get(\"x-request-id\"));\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -959,7 +993,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -978,8 +1013,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -992,14 +1026,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseExpenseUrl}}/api/Expense",
+					"raw": "http://{{baseExpenseUrl}}/api/v1/expenses",
 					"protocol": "http",
 					"host": [
 						"{{baseExpenseUrl}}"
 					],
 					"path": [
 						"api",
-						"Expense"
+						"v1",
+						"expenses"
 					]
 				}
 			},
@@ -1018,16 +1053,18 @@
 							"  pm.expect(responseJson[0].balance).eq(600);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"setTimeout(function(){}, 100);"
+							"setTimeout(function(){}, 300);"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1057,14 +1094,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_1_id}}",
+					"raw": "http://{{baseAccountUrl}}/api/v1/accounts?id={{account_1_id}}",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Account"
+						"v1",
+						"accounts"
 					],
 					"query": [
 						{
@@ -1090,7 +1128,8 @@
 							"  pm.expect(responseJson.body).eq('Account balance less zero');\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -1099,7 +1138,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1129,14 +1169,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseNotificationUrl}}/api/Notification/{{request_id}}",
+					"raw": "http://{{baseNotificationUrl}}/api/v1/notifications/{{request_id}}",
 					"protocol": "http",
 					"host": [
 						"{{baseNotificationUrl}}"
 					],
 					"path": [
 						"api",
-						"Notification",
+						"v1",
+						"notifications",
 						"{{request_id}}"
 					]
 				}
@@ -1155,7 +1196,8 @@
 							"      pm.collectionVariables.set(\"request_id\", pm.request.headers.get(\"x-request-id\"));\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -1164,7 +1206,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1183,8 +1226,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -1197,14 +1239,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseTransferUrl}}/api/Transfer",
+					"raw": "http://{{baseTransferUrl}}/api/v1/transfers",
 					"protocol": "http",
 					"host": [
 						"{{baseTransferUrl}}"
 					],
 					"path": [
 						"api",
-						"Transfer"
+						"v1",
+						"transfers"
 					]
 				}
 			},
@@ -1223,7 +1266,8 @@
 							"  pm.expect(responseJson[0].balance).eq(600);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -1232,7 +1276,8 @@
 						"exec": [
 							"setTimeout(function(){}, 100);"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1262,14 +1307,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_1_id}}",
+					"raw": "http://{{baseAccountUrl}}/api/v1/accounts?id={{account_1_id}}",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Account"
+						"v1",
+						"accounts"
 					],
 					"query": [
 						{
@@ -1294,7 +1340,8 @@
 							"  pm.expect(responseJson[0].balance).eq(300);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -1303,7 +1350,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1333,14 +1381,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseAccountUrl}}/api/Account?id={{account_2_id}}",
+					"raw": "http://{{baseAccountUrl}}/api/v1/accounts?id={{account_2_id}}",
 					"protocol": "http",
 					"host": [
 						"{{baseAccountUrl}}"
 					],
 					"path": [
 						"api",
-						"Account"
+						"v1",
+						"accounts"
 					],
 					"query": [
 						{
@@ -1366,7 +1415,8 @@
 							"  pm.expect(responseJson.body).eq('Account balance less zero');\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -1375,7 +1425,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1405,14 +1456,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseNotificationUrl}}/api/Notification/{{request_id}}",
+					"raw": "http://{{baseNotificationUrl}}/api/v1/notifications/{{request_id}}",
 					"protocol": "http",
 					"host": [
 						"{{baseNotificationUrl}}"
 					],
 					"path": [
 						"api",
-						"Notification",
+						"v1",
+						"notifications",
 						"{{request_id}}"
 					]
 				}
@@ -1431,7 +1483,8 @@
 							"      pm.collectionVariables.set(\"request_id\", pm.request.headers.get(\"x-request-id\"));\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -1440,7 +1493,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1459,8 +1513,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{$guid}}",
-						"type": "text"
+						"value": "{{$guid}}"
 					}
 				],
 				"body": {
@@ -1474,14 +1527,15 @@
 					]
 				},
 				"url": {
-					"raw": "http://{{baseFileUrl}}/api/Import",
+					"raw": "http://{{baseFileUrl}}/api/v1/imports",
 					"protocol": "http",
 					"host": [
 						"{{baseFileUrl}}"
 					],
 					"path": [
 						"api",
-						"Import"
+						"v1",
+						"imports"
 					]
 				}
 			},
@@ -1500,7 +1554,8 @@
 							"  pm.expect(responseJson.length).eq(3);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -1509,7 +1564,8 @@
 						"exec": [
 							"setTimeout(function(){}, 10000);"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1531,8 +1587,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{request_id}}",
-						"type": "text"
+						"value": "{{request_id}}"
 					}
 				],
 				"body": {
@@ -1545,14 +1600,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseDepositUrl}}/api/Deposit",
+					"raw": "http://{{baseDepositUrl}}/api/v1/deposits",
 					"protocol": "http",
 					"host": [
 						"{{baseDepositUrl}}"
 					],
 					"path": [
 						"api",
-						"Deposit"
+						"v1",
+						"deposits"
 					]
 				}
 			},
@@ -1571,7 +1627,8 @@
 							"  pm.expect(responseJson.length).eq(7);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -1580,7 +1637,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1602,8 +1660,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{request_id}}",
-						"type": "text"
+						"value": "{{request_id}}"
 					}
 				],
 				"body": {
@@ -1616,21 +1673,22 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseExpenseUrl}}/api/Expense",
+					"raw": "http://{{baseExpenseUrl}}/api/v1/expenses",
 					"protocol": "http",
 					"host": [
 						"{{baseExpenseUrl}}"
 					],
 					"path": [
 						"api",
-						"Expense"
+						"v1",
+						"expenses"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Check imported expenses Copy",
+			"name": "Check imported transfers",
 			"event": [
 				{
 					"listen": "test",
@@ -1642,7 +1700,8 @@
 							"  pm.expect(responseJson.length).eq(1);\r",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				},
 				{
@@ -1651,7 +1710,8 @@
 						"exec": [
 							""
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1673,8 +1733,7 @@
 				"header": [
 					{
 						"key": "x-request-id",
-						"value": "{{request_id}}",
-						"type": "text"
+						"value": "{{request_id}}"
 					}
 				],
 				"body": {
@@ -1687,14 +1746,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{baseTransferUrl}}/api/Transfer",
+					"raw": "http://{{baseTransferUrl}}/api/v1/transfers",
 					"protocol": "http",
 					"host": [
 						"{{baseTransferUrl}}"
 					],
 					"path": [
 						"api",
-						"Transfer"
+						"v1",
+						"transfers"
 					]
 				}
 			},

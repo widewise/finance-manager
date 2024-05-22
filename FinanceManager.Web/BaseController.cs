@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
-using FinanceManager.TransportLibrary.Services;
+using FinanceManager.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinanceManager.Account.Controllers;
+namespace FinanceManager.Web;
 
 [ApiController]
 public class BaseController : ControllerBase

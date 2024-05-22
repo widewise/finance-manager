@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace FinanceManager.TransportLibrary.Services;
+namespace FinanceManager.Web.Services;
 
 public class ApiKeyAuthorizationFilter : IAuthorizationFilter
 {

@@ -8,6 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Asp.Versioning.Mvc" Version="7.1.1" />
+        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
@@ -25,6 +27,7 @@
     <ItemGroup>
       <ProjectReference Include="..\FinanceManager.Events\FinanceManager.Events.csproj" />
       <ProjectReference Include="..\FinanceManager.TransportLibrary\FinanceManager.TransportLibrary.csproj" />
+      <ProjectReference Include="..\FinanceManager.Web\FinanceManager.Web.csproj" />
     </ItemGroup>
 
 </Project>

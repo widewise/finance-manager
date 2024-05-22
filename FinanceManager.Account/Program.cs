@@ -6,12 +6,13 @@ using FinanceManager.Account.Consumers;
 using FinanceManager.Account.Mapping;
 using FinanceManager.Account.Repositories;
 using FinanceManager.Account.Services;
-using FinanceManager.Account.Swagger;
 using FinanceManager.Events;
 using FinanceManager.Events.Models;
 using FinanceManager.TransportLibrary;
 using FinanceManager.TransportLibrary.Extensions;
 using FinanceManager.UnitOfWork.Extensions;
+using FinanceManager.Web.Extensions;
+using FinanceManager.Web.Swagger;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 
@@ -50,7 +51,7 @@ builder.Services.AddApiVersioning(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.ConfigureOptions<NamedSwaggerGenOptions>();
+builder.Services.ConfigureOptions<NamedSwaggerGenOptions<Program>>();
 
 
 var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -120,7 +121,6 @@ if (app.Environment.IsDevelopment())
                 $"/swagger/{description.GroupName}/swagger.json",
                 $"v{description.GroupName.ToUpperInvariant()}");
         }
-        options.RoutePrefix = string.Empty;
     });
 }
 

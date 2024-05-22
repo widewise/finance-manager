@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using FinanceManager.Testing.Helpers.JwtAuthorisation.Models;
-using FinanceManager.TransportLibrary;
+using FinanceManager.Web;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FinanceManager.Testing.Helpers.JwtAuthorisation;
