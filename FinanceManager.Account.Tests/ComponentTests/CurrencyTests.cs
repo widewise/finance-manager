@@ -12,13 +12,14 @@ namespace FinanceManager.Account.Tests.ComponentTests;
 
 public class CurrencyTests : AccountTestFixture
 {
+    private const string BaseUrl = "api/v1/currencies";
     private IRestServiceClient _httpClient = null!;
     private readonly UriBuilder _uriBuilder;
 
     public CurrencyTests(ITestOutputHelper output) : base(output)
     {
         _uriBuilder = new UriBuilder();
-        _uriBuilder.Path = "api/Currency";
+        _uriBuilder.Path = BaseUrl;
     }
 
     public override async Task InitializeAsync()
@@ -101,7 +102,7 @@ public class CurrencyTests : AccountTestFixture
         var currencyId = createResponse.Id;
 
         //Act
-        var deleteUriBuilder = new UriBuilder { Path = $"api/Currency/{currencyId}" };
+        var deleteUriBuilder = new UriBuilder { Path = $"{BaseUrl}/{currencyId}" };
         await _httpClient.DeleteAsync(deleteUriBuilder.Uri);
 
         //Assert
