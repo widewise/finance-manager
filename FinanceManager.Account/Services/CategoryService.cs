@@ -1,6 +1,9 @@
-﻿using FinanceManager.Account.Models;
+﻿using AutoMapper;
+using FinanceManager.Account.Domain;
+using FinanceManager.Account.Models;
+using FinanceManager.Account.Repositories;
 using FinanceManager.Events;
-using Microsoft.EntityFrameworkCore;
+using FinanceManager.UnitOfWork.EntityFramework.Abstracts;
 
 namespace FinanceManager.Account.Services;
 
@@ -22,36 +25,26 @@ public interface ICategoryService
 public class CategoryService: ICategoryService
 {
     private readonly ILogger<CategoryService> _logger;
-    private readonly AppDbContext _appDbContext;
+    private readonly IMapper _mapper;
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IUnitOfWorkExecuter _unitOfWorkExecuter;
 
     public CategoryService(
         ILogger<CategoryService> logger,
-        AppDbContext appDbContext)
+        IMapper mapper,
+        ICategoryRepository categoryRepository,
+        IUnitOfWorkExecuter unitOfWorkExecuter)
     {
         _logger = logger;
-        _appDbContext = appDbContext;
+        _mapper = mapper;
+        _categoryRepository = categoryRepository;
+        _unitOfWorkExecuter = unitOfWorkExecuter;
     }
 
     public async Task<Category[]> GetAsync(CategoryQueryParameters parameters)
     {
-        var query = _appDbContext.Categories.Where(x => true);
-
-        if (parameters.UserId.HasValue)
-        {
-            query = query.Where(x => x.UserId == parameters.UserId.Value);
-        }
-
-        if (parameters.RequestId != null)
-        {
-            query = query.Where(x => x.RequestId == parameters.RequestId);
-        }
-
-        if (parameters.ParentId != null)
-        {
-            query = query.Where(x => x.ParentId == parameters.ParentId);
-        }
-            
-        return await query.ToArrayAsync();
+        var specification = _mapper.Map<CategorySpecification>(parameters);
+        return await _categoryRepository.GetAsync(specification);
     }
 
     public async Task<Category?> CreateAsync(
@@ -59,7 +52,7 @@ public class CategoryService: ICategoryService
         long userId,
         string requestId)
     {
-        if (await _appDbContext.Categories.AnyAsync(x => x.RequestId == requestId))
+        if (await _categoryRepository.CheckExistAsync(new CategorySpecification(requestId: requestId)))
         {
             _logger.LogWarning(
                 "Category has already created for request with id {RequestId}",
@@ -67,8 +60,7 @@ public class CategoryService: ICategoryService
             return null;
         }
 
-        if (await _appDbContext.Categories.AnyAsync(
-                x => x.Name == model.Name && x.UserId == userId))
+        if (await _categoryRepository.CheckExistAsync(new CategorySpecification(userId: userId, name: model.Name)))
         {
             _logger.LogWarning(
                 "Category with name {Name} has already created",
@@ -76,20 +68,10 @@ public class CategoryService: ICategoryService
             return null;
         }
 
-        var created = await _appDbContext.AddAsync(new Category
-        {
-            Id = Guid.NewGuid(),
-            RequestId = requestId,
-            ParentId = model.ParentId,
-            Type = model.Type,
-            UserId = userId,
-            Name = model.Name,
-            Description = model.Description
-        });
-        
-        await _appDbContext.SaveChangesAsync();
+        var created = await _unitOfWorkExecuter.ExecuteAsync<ICategoryRepository, Category>(
+            repo => repo.CreateAsync(requestId, model.ParentId, model.Type, userId, model.Name, model.Description));
 
-        return created.Entity;
+        return created;
     }
     
     public async Task<Category[]?> BulkCreateAsync(
@@ -97,7 +79,7 @@ public class CategoryService: ICategoryService
         long userId,
         string requestId)
     {
-        if (await _appDbContext.Categories.AnyAsync(x => x.RequestId == requestId))
+        if (await _categoryRepository.CheckExistAsync(new CategorySpecification(requestId: requestId)))
         {
             _logger.LogWarning(
                 "Categories has already created for request with id {RequestId}",
@@ -116,15 +98,15 @@ public class CategoryService: ICategoryService
             Description = model.Description
         }).ToArray();
 
-        await _appDbContext.BulkInsertAsync(newEntities);
-        await _appDbContext.BulkSaveChangesAsync();
+        await _unitOfWorkExecuter.ExecuteAsync<ICategoryRepository>(
+            repo => repo.BulkCreateAsync(newEntities));
 
         return newEntities;
     }
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var existed = await _appDbContext.Categories.FirstOrDefaultAsync(x => x.Id == id);
+        var existed = (await _categoryRepository.GetAsync(new CategorySpecification(id: id))).FirstOrDefault();
         if (existed == null)
         {
             _logger.LogWarning("Category with id {d} is not found", id);
@@ -137,29 +119,27 @@ public class CategoryService: ICategoryService
             return false;
         }
 
-        if (await _appDbContext.Categories.AnyAsync(x => x.ParentId == existed.Id))
+        if (await _categoryRepository.CheckExistAsync(new CategorySpecification(parentId: existed.Id)))
         {
             _logger.LogWarning("Category with id {d} has children", id);
             return false;
         }
 
         //TODO: check deposits, expenses
-        _appDbContext.Categories.Remove(existed);
-        await _appDbContext.SaveChangesAsync();
+        await _unitOfWorkExecuter.ExecuteAsync<ICategoryRepository>(
+            repo => repo.DeleteAsync(existed));
         return true;
     }
 
     public async Task RejectAsync(string requestId)
     {
-        var categories = await _appDbContext.Categories
-            .Where(x => x.RequestId == requestId)
-            .ToArrayAsync();
+        var categories = await _categoryRepository.GetAsync(new CategorySpecification(requestId: requestId));
         if (!categories.Any())
         {
             return;
         }
 
-        _appDbContext.Categories.RemoveRange(categories);
-        await _appDbContext.SaveChangesAsync();
+        await _unitOfWorkExecuter.ExecuteAsync<ICategoryRepository>(
+            repo => repo.BulkDeleteAsync(categories));
     }
 }

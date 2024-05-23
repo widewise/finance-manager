@@ -1,4 +1,5 @@
-﻿using FinanceManager.Account.Models;
+﻿using FinanceManager.Account.Domain;
+using FinanceManager.Account.Models;
 using FinanceManager.Events;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,10 +19,10 @@ public class AppDbContext: DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
 
-    public DbSet<Models.Account> Accounts { get; set; }
-    public DbSet<Models.AccountLimit> AccountLimits { get; set; }
-    public DbSet<Models.Category> Categories { get; set; }
-    public DbSet<Models.Currency> Currencies { get; set; }
+    public DbSet<Domain.Account> Accounts { get; set; }
+    public DbSet<AccountLimit> AccountLimits { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Currency> Currencies { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

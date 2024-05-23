@@ -1,4 +1,4 @@
-﻿namespace FinanceManager.Account.Models;
+﻿namespace FinanceManager.Account.Domain;
 
 public class Category
 {
