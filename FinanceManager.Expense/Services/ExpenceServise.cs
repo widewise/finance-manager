@@ -112,7 +112,7 @@ public class ExpenseService : IExpenseService
             await _appDbContext.SaveChangesAsync();
             if (model.CategoryId != TransferConstants.TransferCategoryId)
             {
-                _changeAccountBalancePublisher.Send(new ChangeAccountBalanceEvent
+                await _changeAccountBalancePublisher.SendAsync(new ChangeAccountBalanceEvent
                 {
                     TransactionId = requestId,
                     AccountId = model.AccountId,
@@ -160,7 +160,7 @@ public class ExpenseService : IExpenseService
         existed.Value = model.Value;
         _appDbContext.Expenses.Update(existed);
         await _appDbContext.SaveChangesAsync();
-        _changeAccountBalancePublisher.Send(new ChangeAccountBalanceEvent
+        await _changeAccountBalancePublisher.SendAsync(new ChangeAccountBalanceEvent
         {
             TransactionId = requestId,
             AccountId = model.AccountId,
@@ -200,7 +200,7 @@ public class ExpenseService : IExpenseService
 
             _appDbContext.Expenses.RemoveRange(expenses);
             await _appDbContext.SaveChangesAsync();
-            _addExpenseRejectPublisher.Send(new AddExpenseRejectEvent
+            await _addExpenseRejectPublisher.SendAsync(new AddExpenseRejectEvent
             {
                 TransactionId = requestId
             });

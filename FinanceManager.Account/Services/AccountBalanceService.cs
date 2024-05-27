@@ -116,7 +116,7 @@ public class AccountBalanceService : IAccountBalanceService
 
         var limits = await _accountLimitRepository.GetAsync(new AccountLimitSpecification(accountId: model.AccountId));
 
-        var validateResult = account.ValidateAndUpdateBalance(
+        var validateResult = await account.ValidateAndUpdateBalanceAsync(
             limits,
             model.Value,
             model.Date,

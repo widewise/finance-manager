@@ -54,6 +54,7 @@ builder.Services.AddCustomAuthentication(
     FinanceIdentityConstants.TransferTitle,
     FinanceIdentityConstants.TransferAudience);
 
+builder.Services.AddCommon();
 builder.Services.AddTransportCore(builder.Configuration);
 builder.Services.AddTransportPublisher<AddDepositEvent>(EventConstants.DepositExchange);
 builder.Services.AddTransportPublisher<DeleteDepositEvent>(EventConstants.DepositExchange);

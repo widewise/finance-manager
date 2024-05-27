@@ -130,9 +130,9 @@ public class TransferService : ITransferService
             });
 
             await _appDbContext.SaveChangesAsync();
-            _addDepositPublisher.Send(addDepositEvent);
-            _addExpensePublisher.Send(addExpenseEvent);
-            _transferBetweenAccountsPublisher.Send(transferBetweenAccountsEvent);
+            await _addDepositPublisher.SendAsync(addDepositEvent);
+            await _addExpensePublisher.SendAsync(addExpenseEvent);
+            await _transferBetweenAccountsPublisher.SendAsync(transferBetweenAccountsEvent);
 
             return created.Entity;
         }
@@ -171,12 +171,12 @@ public class TransferService : ITransferService
 
         _appDbContext.Transfers.Remove(existed);
         await _appDbContext.SaveChangesAsync();
-        _deleteDepositPublisher.Send(new DeleteDepositEvent
+        await _deleteDepositPublisher.SendAsync(new DeleteDepositEvent
         {
             TransactionId = existed.RequestId,
             Id = existed.DepositId
         });
-        _deleteExpensePublisher.Send(new DeleteExpenseEvent
+        await _deleteExpensePublisher.SendAsync(new DeleteExpenseEvent
         {
             TransactionId = existed.RequestId,
             Id = existed.ExpenseId
@@ -198,18 +198,18 @@ public class TransferService : ITransferService
 
             _appDbContext.Transfers.RemoveRange(transfers);
             await _appDbContext.SaveChangesAsync();
-            _addTransferRejectEvent.Send(new AddTransferRejectEvent
+            await _addTransferRejectEvent.SendAsync(new AddTransferRejectEvent
             {
                 TransactionId = requestId
             });
             foreach (var transfer in transfers)
             {
-                _deleteDepositPublisher.Send(new DeleteDepositEvent
+                await _deleteDepositPublisher.SendAsync(new DeleteDepositEvent
                 {
                     TransactionId = requestId,
                     Id = transfer.DepositId
                 });
-                _deleteExpensePublisher.Send(new DeleteExpenseEvent
+                await _deleteExpensePublisher.SendAsync(new DeleteExpenseEvent
                 {
                     TransactionId = requestId,
                     Id = transfer.ExpenseId

@@ -1,9 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using FinanceManager.TransportLibrary.Models;
 using FinanceManager.TransportLibrary.Services;
+using FinanceManager.TransportLibrary.Services.Outbox;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using RabbitMQ.Client;
+using RedLockNet;
 
 namespace FinanceManager.TransportLibrary.Extensions;
 
@@ -11,6 +15,14 @@ namespace FinanceManager.TransportLibrary.Extensions;
 public static class ServiceCollectionExtensions
 {
     private static readonly List<TransportInfo> TransportMap = new();
+    private static bool _outboxEnabled;
+
+    public static IServiceCollection AddCommon(this IServiceCollection services)
+    {
+        services.AddSingleton<IDistributedLockFactory, GlobalLockService>();
+
+        return services;
+    }
 
     public static IServiceCollection AddTransportCore(
         this IServiceCollection services,
@@ -19,6 +31,19 @@ public static class ServiceCollectionExtensions
         var settings = new MessageTransportSettings();
         configuration.GetSection(MessageTransportSettings.SectionName).Bind(settings);
         services.AddSingleton(settings);
+        var outboxSetting = new OutboxSettings();
+        configuration.GetSection(OutboxSettings.SectionName).Bind(outboxSetting);
+        _outboxEnabled = outboxSetting.Enabled;
+        services.AddSingleton(outboxSetting);
+        if (_outboxEnabled)
+        {
+            services.AddTransient<IDbConnection>(_ => new NpgsqlConnection(configuration.GetConnectionString("DefaultConnection")));
+            services.AddTransient<IMessageRepository, MessageRepository>();
+            services.AddTransient<IOutboxDbMigrator, OutboxDbMigrator>();
+            services.AddTransient<IGetWaitTimeForNextOutboxCallService, GetWaitTimeForNextOutboxCallService>();
+            services.AddScoped<IOutboxSessionService, OutboxSessionService>();
+            services.AddHostedService<OutboxBackgroundService>();
+        }
 
         ConnectionFactory connectionFactory = new ConnectionFactory
         {
@@ -55,6 +80,12 @@ public static class ServiceCollectionExtensions
                 queue: info.QueueName,
                 autoAck: false,
                 consumer: consumer);
+        }
+
+        if (_outboxEnabled)
+        {
+            using var migrator = serviceProvider.GetRequiredService<IOutboxDbMigrator>();
+            migrator.Migrate();
         }
 
         return serviceProvider;
@@ -95,11 +126,21 @@ public static class ServiceCollectionExtensions
         string exchangeName)
     {
         var eventName = typeof(TMessage).Name;
+        services.AddTransient<MessagePublisher<TMessage>>(p =>
+        {
+            var channel = p.GetRequiredService<IModel>();
+            return new MessagePublisher<TMessage>(channel, exchangeName, eventName);
+        });
         services.AddTransient<IMessagePublisher<TMessage>>(p =>
         {
             var channel = p.GetRequiredService<IModel>();
             return new MessagePublisher<TMessage>(channel, exchangeName, eventName);
         });
+        services.Decorate<IMessagePublisher<TMessage>, CircuitBreakerMessagePublisherDecorator<TMessage>>();
+        if (_outboxEnabled)
+        {
+            services.Decorate<IMessagePublisher<TMessage>, OutboxMessagePublisherDecorator<TMessage>>();
+        }
         return services;
     }
 }

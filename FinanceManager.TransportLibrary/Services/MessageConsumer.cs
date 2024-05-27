@@ -55,12 +55,12 @@ public abstract class MessageConsumer<TMessage, TRevertMessage>: AsyncEventingBa
 
     public abstract Task ExecuteEventAsync(TMessage message);
 
-    protected Task RejectEventAsync(TMessage message)
+    protected async Task RejectEventAsync(TMessage message)
     {
         var rejeectableEvenMessage = message as IRejectableEvent;
         if (rejeectableEvenMessage == null || _revertMessagePublisher == null)
         {
-            return Task.CompletedTask;
+            return;
         }
         _logger.LogInformation(
             "Publish revert message {MessageType} with transaction id {TransactionId}",
@@ -68,8 +68,7 @@ public abstract class MessageConsumer<TMessage, TRevertMessage>: AsyncEventingBa
             message.TransactionId);
         if (rejeectableEvenMessage.GetRejectEvent() is TRevertMessage rejectEvent)
         {
-            _revertMessagePublisher.Send(rejectEvent);
+            await _revertMessagePublisher.SendAsync(rejectEvent);
         }
-        return Task.CompletedTask;
     }
 }

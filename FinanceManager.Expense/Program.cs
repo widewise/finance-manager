@@ -53,7 +53,7 @@ builder.Services.AddCustomAuthentication(
     builder.Configuration,
     FinanceIdentityConstants.ExpenseTitle,
     FinanceIdentityConstants.ExpenseAudience);
-
+builder.Services.AddCommon();
 builder.Services.AddTransportCore(builder.Configuration);
 builder.Services.AddTransportPublisher<ChangeAccountBalanceEvent>(EventConstants.AccountExchange);
 builder.Services.AddTransportPublisher<AddExpenseRejectEvent>(EventConstants.FileExchange);

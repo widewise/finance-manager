@@ -47,6 +47,7 @@ if (dbConnectionString != null)
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(dbConnectionString));
 }
+builder.Services.AddCommon();
 builder.Services.AddTransportCore(builder.Configuration);
 builder.Services.AddTransportConsumer<ChangeStatisticsEvent, ChangeStatisticsConsumer>(
     EventConstants.StatisticsExchange,

@@ -53,7 +53,7 @@ builder.Services.AddCustomAuthentication(
     builder.Configuration,
     FinanceIdentityConstants.DepositTitle,
     FinanceIdentityConstants.DepositAudience);
-
+builder.Services.AddCommon();
 builder.Services.AddTransportCore(builder.Configuration);
 builder.Services.AddTransportPublisher<AddDepositRejectEvent>(EventConstants.FileExchange);
 builder.Services.AddTransportPublisher<ChangeAccountBalanceEvent>(EventConstants.AccountExchange);
