@@ -14,6 +14,7 @@ namespace FinanceManager.TransportLibrary.Extensions;
 [ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
+    private const int RetryDelay = 10000;
     private static readonly List<TransportInfo> TransportMap = new();
     private static bool _outboxEnabled;
 
@@ -67,9 +68,30 @@ public static class ServiceCollectionExtensions
         var channel = serviceProvider.GetRequiredService<IModel>();
         foreach (var info in TransportMap)
         {
+            var deadLetterExchangeName = $"dead-letter-{info.ExchangeName}";
+            var deadLetterQueueName = $"dead-letter-{info.QueueName}";
+
+            channel.QueueDeclare(deadLetterQueueName, false, false, false, new Dictionary<string, object>
+            {
+                {"x-dead-letter-exchange", info.ExchangeName},
+                {"x-dead-letter-routing-key", info.EventName},
+                {"x-max-length", 50000},
+                {"x-overflow", "reject-publish"},
+                {"x-message-ttl", RetryDelay}
+            });
+            channel.ExchangeDeclare(deadLetterExchangeName, ExchangeType.Topic);
+
+            channel.QueueBind(deadLetterQueueName, deadLetterExchangeName, info.EventName);
+
             channel.ExchangeDeclare(info.ExchangeName, ExchangeType.Direct);
-            channel.QueueDeclare(info.QueueName, false, false, false, null);
+            
+            channel.QueueDeclare(info.QueueName, false, false, false, new Dictionary<string, object>
+            {
+                {"x-dead-letter-exchange", deadLetterExchangeName}
+            });
+
             channel.QueueBind(info.QueueName, info.ExchangeName, info.EventName);
+            
             var consumer = serviceProvider.GetRequiredService(info.Consumer) as IBasicConsumer;
             if (consumer == null)
             {
