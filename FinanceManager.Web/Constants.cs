@@ -1,4 +1,4 @@
-﻿namespace FinanceManager.TransportLibrary;
+﻿namespace FinanceManager.Web;
 
 public static class Constants
 {

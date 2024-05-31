@@ -1,9 +1,11 @@
-﻿using FinanceManager.TransportLibrary.Models;
+﻿using Asp.Versioning;
+using FinanceManager.TransportLibrary.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.User.Controllers;
 
 [ApiController]
+[ApiVersionNeutral]
 [Route("[controller]")]
 public class HealthController : ControllerBase
 {

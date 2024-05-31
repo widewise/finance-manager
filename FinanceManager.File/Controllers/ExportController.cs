@@ -1,14 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using FinanceManager.File.Services;
-using FinanceManager.TransportLibrary;
-using FinanceManager.TransportLibrary.Extensions;
+using FinanceManager.Web;
+using FinanceManager.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.File.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion(1.0)]
+[Route("api/v{v:apiVersion}/exports")]
 public class ExportController : ControllerBase
 {
     private readonly ILogger<ExportController> _logger;

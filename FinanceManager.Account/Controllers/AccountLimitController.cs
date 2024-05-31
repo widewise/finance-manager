@@ -1,16 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Asp.Versioning;
 using FinanceManager.Account.Models;
 using FinanceManager.Account.Services;
 using FinanceManager.TransportLibrary;
+using FinanceManager.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.Account.Controllers;
 
 [Authorize]
-[ApiController]
-[Route("api/[controller]")]
-public class AccountLimitController : ControllerBase
+[ApiVersion(1.0)]
+[Route("api/v{v:apiVersion}/accounts/limits")]
+public class AccountLimitController : BaseController
 {
     private readonly IAccountLimitService _accountLimitService;
 
@@ -51,5 +53,14 @@ public class AccountLimitController : ControllerBase
     {
         var res = await _accountLimitService.DeleteAsync(id);
         return res ? Ok() : BadRequest();
+    }
+    
+    [HttpOptions]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [AllowAnonymous]
+    public IActionResult DocumentsOptions()
+    {
+        AddAllowHeader();
+        return Ok();
     }
 }

@@ -9,6 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Asp.Versioning.Mvc" Version="7.1.1" />
+        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.1.0" />
+        <PackageReference Include="AutoMapper" Version="13.0.1" />
         <PackageReference Include="IdentityServer4" Version="4.1.2" />
         <PackageReference Include="IdentityServer4.AspNetIdentity" Version="4.1.2" />
         <PackageReference Include="IdentityServer4.EntityFramework" Version="4.1.2" />
@@ -31,6 +34,7 @@
     <ItemGroup>
       <ProjectReference Include="..\FinanceManager.Events\FinanceManager.Events.csproj" />
       <ProjectReference Include="..\FinanceManager.TransportLibrary\FinanceManager.TransportLibrary.csproj" />
+      <ProjectReference Include="..\FinanceManager.Web\FinanceManager.Web.csproj" />
     </ItemGroup>
 
     <ItemGroup>

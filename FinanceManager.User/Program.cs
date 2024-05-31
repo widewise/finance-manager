@@ -1,10 +1,14 @@
 using System.Reflection;
 using System.Text;
-using FinanceManager.TransportLibrary;
-using FinanceManager.TransportLibrary.Extensions;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Conventions;
 using FinanceManager.User;
 using FinanceManager.User.Models;
 using FinanceManager.User.Services;
+using FinanceManager.Web;
+using FinanceManager.Web.Extensions;
+using FinanceManager.Web.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +22,23 @@ builder.Configuration.AddEnvironmentVariables();
 // Add services to the container.
 
 builder.Services.AddControllers();
-
+builder.Services.AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1.0);
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ReportApiVersions = true;
+    })
+    .AddMvc(
+        options =>
+        {
+            // automatically applies an api version based on the name of
+            // the defining controller's namespace
+            options.Conventions.Add(new VersionByNamespaceConvention());
+        })
+    .AddApiExplorer();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerWithAuthentication("User API");
+builder.Services.ConfigureOptions<NamedSwaggerGenOptions<Program>>();
 
 var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (dbConnectionString == null)
@@ -112,8 +130,17 @@ logger.LogInformation("DB migrated");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                $"v{description.GroupName.ToUpperInvariant()}");
+        }
+    });
 }
 
 app.UseExceptionHandler(a => a.AddDefaultExceptionHandler(logger));

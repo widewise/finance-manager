@@ -1,5 +1,6 @@
-﻿using FinanceManager.TransportLibrary.Extensions;
+﻿using Asp.Versioning;
 using FinanceManager.User.Models;
+using FinanceManager.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,8 @@ namespace FinanceManager.User.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion(1.0)]
+[Route("api/v{v:apiVersion}/users")]
 public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> _logger;

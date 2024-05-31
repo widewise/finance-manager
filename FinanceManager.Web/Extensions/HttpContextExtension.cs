@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
-namespace FinanceManager.TransportLibrary.Extensions;
+namespace FinanceManager.Web.Extensions;
 
 public static class HttpContextExtension
 {

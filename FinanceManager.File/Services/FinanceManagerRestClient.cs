@@ -3,8 +3,8 @@ using System.Net;
 using System.Text.Json;
 using FinanceManager.File.Models;
 using FinanceManager.File.Models.External;
-using FinanceManager.TransportLibrary;
-using FinanceManager.TransportLibrary.Models;
+using FinanceManager.Web;
+using FinanceManager.Web.Models;
 using Microsoft.Extensions.Options;
 using RestSharp;
 using Polly;
@@ -77,7 +77,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Account[]>(
             _settings.AccountServiceBaseUrl,
-            $"api/account/internal?userId={userId}",
+            $"api/v1/accounts/internal?userId={userId}",
             transactionId);
     }
 
@@ -88,7 +88,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Account[]>(
             _settings.AccountServiceBaseUrl,
-            $"api/account/{userId}/bulk",
+            $"api/v1/accounts/{userId}/bulk",
             transactionId,
             models,
             Method.Post);
@@ -98,7 +98,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync(
             _settings.AccountServiceBaseUrl,
-            "api/account",
+            "api/v1/accounts",
             transactionId,
             Method.Delete);
     }
@@ -107,7 +107,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Currency[]>(
             _settings.AccountServiceBaseUrl,
-            $"api/currency/internal?userId={userId}",
+            $"api/v1/currencies/internal?userId={userId}",
             transactionId);
     }
 
@@ -118,7 +118,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Currency[]>(
             _settings.AccountServiceBaseUrl,
-            $"api/currency/{userId}/bulk",
+            $"api/v1/currencies/{userId}/bulk",
             transactionId,
             models,
             Method.Post);
@@ -128,7 +128,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync(
             _settings.AccountServiceBaseUrl,
-            "api/currency",
+            "api/v1/currencies",
             requestId: transactionId,
             method: Method.Delete);
     }
@@ -137,7 +137,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Category[]>(
             _settings.AccountServiceBaseUrl,
-            $"api/category/internal?userId={userId}",
+            $"api/v1/categories/internal?userId={userId}",
             transactionId);
     }
 
@@ -148,7 +148,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Category[]>(
             _settings.AccountServiceBaseUrl,
-            $"api/category/{userId}/bulk",
+            $"api/v1/categories/{userId}/bulk",
             transactionId,
             models,
             Method.Post);
@@ -158,7 +158,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync(
             _settings.AccountServiceBaseUrl,
-            "api/category",
+            "api/v1/categories",
             transactionId,
             Method.Delete);
     }
@@ -167,7 +167,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Deposit[]>(
             _settings.DepositServiceBaseUrl,
-            $"api/deposit/internal?userId={userId}",
+            $"api/v1/deposits/internal?userId={userId}",
             transactionId);
     }
 
@@ -175,7 +175,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync(
             _settings.DepositServiceBaseUrl,
-            "api/deposit",
+            "api/v1/deposits",
             transactionId,
             Method.Delete);
     }
@@ -184,7 +184,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Expense[]>(
             _settings.ExpenseServiceBaseUrl,
-            $"api/expense/internal?userId={userId}",
+            $"api/v1/expenses/internal?userId={userId}",
             transactionId);
     }
 
@@ -192,7 +192,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync(
             _settings.ExpenseServiceBaseUrl,
-            "api/expense",
+            "api/v1/expenses",
             transactionId,
             Method.Delete);
     }
@@ -201,7 +201,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync<Transfer[]>(
             _settings.TransferServiceBaseUrl,
-            $"api/transfer/internal?userId={userId}",
+            $"api/v1/transfers/internal?userId={userId}",
             transactionId);
     }
 
@@ -209,7 +209,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
     {
         return InternalExecuteAsync(
             _settings.TransferServiceBaseUrl,
-            "api/transfer",
+            "api/v1/transfers",
             transactionId,
             Method.Delete);
     }

@@ -1,11 +1,13 @@
-﻿using FinanceManager.Statistics.Models;
+﻿using Asp.Versioning;
+using FinanceManager.Statistics.Models;
 using FinanceManager.Statistics.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.Statistics.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion(1.0)]
+[Route("api/v{v:apiVersion}/statistics")]
 public class StatisticsController : ControllerBase
 {
     private readonly IBalanceLevelStatisticsService _balanceLevelStatisticsService;

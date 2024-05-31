@@ -1,9 +1,14 @@
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Conventions;
 using FinanceManager.Events;
 using FinanceManager.Events.Models;
 using FinanceManager.Statistics;
 using FinanceManager.Statistics.Consumers;
 using FinanceManager.Statistics.Services;
 using FinanceManager.TransportLibrary.Extensions;
+using FinanceManager.Web.Extensions;
+using FinanceManager.Web.Swagger;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,9 +21,24 @@ builder.Services.AddTransient<IBalanceLevelStatisticsService, BalanceLevelStatis
 builder.Services.AddTransient<ICategoryTotalTimeStatisticsService, CategoryTotalTimeStatisticsService>();
 
 builder.Services.AddControllers();
+builder.Services.AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1.0);
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ReportApiVersions = true;
+    })
+    .AddMvc(
+        options =>
+        {
+            // automatically applies an api version based on the name of
+            // the defining controller's namespace
+            options.Conventions.Add(new VersionByNamespaceConvention());
+        })
+    .AddApiExplorer();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.ConfigureOptions<NamedSwaggerGenOptions<Program>>();
 
 var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (dbConnectionString != null)
@@ -55,8 +75,17 @@ if (dbConnectionString != null)
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                $"v{description.GroupName.ToUpperInvariant()}");
+        }
+    });
 }
 
 app.UseExceptionHandler(a => a.AddDefaultExceptionHandler(logger));

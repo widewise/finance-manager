@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace FinanceManager.TransportLibrary.Services;
+namespace FinanceManager.Web.Services;
 
 public class ApiKeyAttribute : ServiceFilterAttribute
 {
