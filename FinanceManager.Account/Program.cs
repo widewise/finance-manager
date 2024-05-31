@@ -1,3 +1,4 @@
+using System.Reflection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Conventions;
@@ -37,7 +38,7 @@ builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 builder.Services.AddControllers();
 builder.Services.AddApiVersioning(options =>
 {
-    options.DefaultApiVersion = new ApiVersion(1.0);
+    options.DefaultApiVersion = new ApiVersion(2.0);
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
 })
@@ -51,7 +52,11 @@ builder.Services.AddApiVersioning(options =>
     .AddApiExplorer();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
 builder.Services.ConfigureOptions<NamedSwaggerGenOptions<Program>>();
 
 var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");

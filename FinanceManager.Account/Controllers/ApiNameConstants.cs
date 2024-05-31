@@ -2,9 +2,11 @@
 
 public static class ApiNameConstants
 {
-    public const string GetCurrency = "GetCurrency";
+    public const string GetCurrencyV1 = "GetCurrency1";
+    public const string GetCurrencyV2 = "GetCurrency2";
     public const string GetInternalCurrency = "GetInternalCurrency";
-    public const string CreateCurrency = "CreateCurrency";
+    public const string CreateCurrencyV1 = "CreateCurrency1";
+    public const string CreateCurrencyV2 = "CreateCurrency2";
     public const string BulkCreateCurrencies = "BulkCreateCurrencies";
     public const string DeleteCurrency = "DeleteCurrency";
     public const string RejectCurrencies = "RejectCurrencies";
