@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using RedLockNet;
 
-namespace FinanceManager.File.Services;
+namespace FinanceManager.TransportLibrary.Services;
 
   public class GlobalLockService : IDistributedLockFactory
   {

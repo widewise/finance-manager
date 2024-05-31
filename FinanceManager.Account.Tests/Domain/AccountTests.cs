@@ -33,7 +33,7 @@ public class AccountTests
     }
 
     [AutoData, Theory]
-    public void NewBalanceLessZeroAndNotEmptyUserAddress_ValidateAndUpdateBalance_ShouldReturnFalseAndSendNotification(
+    public async Task NewBalanceLessZeroAndNotEmptyUserAddress_ValidateAndUpdateBalance_ShouldReturnFalseAndSendNotification(
         Account.Domain.Account account,
         AccountLimit[] limits,
         string userAddress)
@@ -41,7 +41,7 @@ public class AccountTests
         //Arrange
         account.Balance = 0;
         //Act
-        var result = account.ValidateAndUpdateBalance(
+        var result = await account.ValidateAndUpdateBalanceAsync(
             limits,
             -10,
             _changeDate,
@@ -56,19 +56,19 @@ public class AccountTests
         //Assert
         result.Should().BeFalse();
         _notificationSendEventPublisherMock
-            .Verify(x => x.Send(It.IsAny<NotificationSendEvent>()),
+            .Verify(x => x.SendAsync(It.IsAny<NotificationSendEvent>()),
                 Times.Once);
     }
 
     [AutoData, Theory]
-    public void NewBalanceLessZeroAndNullUserAddress_ValidateAndUpdateBalance_ShouldReturnFalseAndNotSendNotification(
+    public async Task NewBalanceLessZeroAndNullUserAddress_ValidateAndUpdateBalance_ShouldReturnFalseAndNotSendNotification(
         Account.Domain.Account account,
         AccountLimit[] limits)
     {
         //Arrange
         account.Balance = 0;
         //Act
-        var result = account.ValidateAndUpdateBalance(
+        var result = await account.ValidateAndUpdateBalanceAsync(
             limits,
             -10,
             _changeDate,
@@ -83,18 +83,18 @@ public class AccountTests
         //Assert
         result.Should().BeFalse();
         _notificationSendEventPublisherMock
-            .Verify(x => x.Send(It.IsAny<NotificationSendEvent>()),
+            .Verify(x => x.SendAsync(It.IsAny<NotificationSendEvent>()),
                 Times.Never);
     }
 
     [AutoData, Theory]
-    public void NewBalanceMoreZeroAndNoLimits_ValidateAndUpdateBalance_ShouldReturnTrueAndSendChangeStatistics(
+    public async Task NewBalanceMoreZeroAndNoLimits_ValidateAndUpdateBalance_ShouldReturnTrueAndSendChangeStatistics(
         Account.Domain.Account account)
     {
         //Arrange
         var changeValue = 10;
         //Act
-        var result = account.ValidateAndUpdateBalance(
+        var result = await account.ValidateAndUpdateBalanceAsync(
             Array.Empty<AccountLimit>(),
             changeValue,
             _changeDate,
@@ -109,12 +109,12 @@ public class AccountTests
         //Assert
         result.Should().BeTrue();
         _changeStatisticsEventPublisherMock
-            .Verify(x => x.Send(It.IsAny<ChangeStatisticsEvent>()),
+            .Verify(x => x.SendAsync(It.IsAny<ChangeStatisticsEvent>()),
                 Times.Once);
     }
 
     [AutoData, Theory]
-    public void NewBalanceMoreZeroAndNotificationLimitAndUserAddress_ValidateAndUpdateBalance_ShouldReturnTrueAndSendBothEvents(
+    public async Task NewBalanceMoreZeroAndNotificationLimitAndUserAddress_ValidateAndUpdateBalance_ShouldReturnTrueAndSendBothEvents(
         Account.Domain.Account account,
         AccountLimit notificationLimit,
         string userAddress)
@@ -124,7 +124,7 @@ public class AccountTests
         notificationLimit.LimitValue = 10;
         notificationLimit.Type = AccountLimitType.Notify;
         //Act
-        var result = account.ValidateAndUpdateBalance(
+        var result = await account.ValidateAndUpdateBalanceAsync(
             new[] { notificationLimit },
             changeValue,
             _changeDate,
@@ -139,15 +139,15 @@ public class AccountTests
         //Assert
         result.Should().BeTrue();
         _notificationSendEventPublisherMock
-            .Verify(x => x.Send(It.IsAny<NotificationSendEvent>()),
+            .Verify(x => x.SendAsync(It.IsAny<NotificationSendEvent>()),
                 Times.Once);
         _changeStatisticsEventPublisherMock
-            .Verify(x => x.Send(It.IsAny<ChangeStatisticsEvent>()),
+            .Verify(x => x.SendAsync(It.IsAny<ChangeStatisticsEvent>()),
                 Times.Once);
     }
 
     [AutoData, Theory]
-    public void NewBalanceMoreZeroAndRestrictionLimit_ValidateAndUpdateBalance_ShouldReturnFalseAndNotSendBothEvents(
+    public async Task NewBalanceMoreZeroAndRestrictionLimit_ValidateAndUpdateBalance_ShouldReturnFalseAndNotSendBothEvents(
         Account.Domain.Account account,
         AccountLimit restictionLimit,
         string userAddress)
@@ -157,7 +157,7 @@ public class AccountTests
         restictionLimit.LimitValue = 10;
         restictionLimit.Type = AccountLimitType.Restrict;
         //Act
-        var result = account.ValidateAndUpdateBalance(
+        var result = await account.ValidateAndUpdateBalanceAsync(
             new[] { restictionLimit },
             changeValue,
             _changeDate,
@@ -172,10 +172,10 @@ public class AccountTests
         //Assert
         result.Should().BeFalse();
         _notificationSendEventPublisherMock
-            .Verify(x => x.Send(It.IsAny<NotificationSendEvent>()),
+            .Verify(x => x.SendAsync(It.IsAny<NotificationSendEvent>()),
                 Times.Never);
         _changeStatisticsEventPublisherMock
-            .Verify(x => x.Send(It.IsAny<ChangeStatisticsEvent>()),
+            .Verify(x => x.SendAsync(It.IsAny<ChangeStatisticsEvent>()),
                 Times.Never);
     }
 }

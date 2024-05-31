@@ -48,6 +48,7 @@ if (dbConnectionString != null)
         options.UseNpgsql(dbConnectionString));
 }
 
+builder.Services.AddCommon();
 builder.Services.AddTransportCore(builder.Configuration);
 builder.Services.AddTransportConsumer<NotificationSendEvent, NotificationSendConsumer>(
     EventConstants.NotificationExchange,

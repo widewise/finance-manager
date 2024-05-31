@@ -23,6 +23,7 @@ builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddCommon();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAccountLimitRepository, AccountLimitRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -53,7 +54,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureOptions<NamedSwaggerGenOptions<Program>>();
 
-
 var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (dbConnectionString != null)
 {
@@ -69,7 +69,7 @@ builder.Services.AddCustomAuthentication(
     builder.Configuration,
     FinanceIdentityConstants.AccountTitle,
     FinanceIdentityConstants.AccountAudience);
-
+builder.Services.AddCommon();
 builder.Services.AddTransportCore(builder.Configuration);
 builder.Services.AddTransportPublisher<NotificationSendEvent>(EventConstants.NotificationExchange);
 builder.Services.AddTransportPublisher<ChangeStatisticsEvent>(EventConstants.StatisticsExchange);

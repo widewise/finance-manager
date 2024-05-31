@@ -9,6 +9,7 @@ using FinanceManager.File.Models;
 using FinanceManager.File.Services;
 using FinanceManager.TransportLibrary;
 using FinanceManager.TransportLibrary.Extensions;
+using FinanceManager.TransportLibrary.Services;
 using FinanceManager.Web.Extensions;
 using FinanceManager.Web.Models;
 using FinanceManager.Web.Swagger;
@@ -27,7 +28,7 @@ builder.Services.Configure<ImportDataSettings>(
     builder.Configuration.GetSection(ImportDataSettings.Section));
 builder.Services.Configure<ApiKeySettings>(
     builder.Configuration.GetSection(ApiKeySettings.Section));
-builder.Services.AddSingleton<IDistributedLockFactory, GlobalLockService>();
+builder.Services.AddCommon();
 builder.Services.AddScoped<IFinanceManagerRestClient, FinanceManagerRestClient>();
 builder.Services.AddScoped<IImportCurrenciesService, ImportCurrenciesService>();
 builder.Services.AddScoped<IImportCategoriesService, ImportCategoriesService>();

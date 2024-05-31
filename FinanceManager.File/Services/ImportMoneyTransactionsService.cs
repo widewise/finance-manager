@@ -86,7 +86,7 @@ public class ImportMoneyTransactionsService : IImportMoneyTransactionsService
                     throw new ImportDataException();
                 }
 
-                _addDepositPublisher.Send(new AddDepositEvent
+                await _addDepositPublisher.SendAsync(new AddDepositEvent
                 {
                     TransactionId = session.RequestId,
                     UserId = session.UserId,
@@ -125,7 +125,7 @@ public class ImportMoneyTransactionsService : IImportMoneyTransactionsService
         }
     }
 
-    private Task ImportExpensesAsync(
+    private async Task ImportExpensesAsync(
         ImportSession session,
         Dictionary<string, Guid> categories,
         Dictionary<string, Guid> accounts,
@@ -155,7 +155,7 @@ public class ImportMoneyTransactionsService : IImportMoneyTransactionsService
                     session.Id);
                 throw new ImportDataException();
             }
-            _addExpensePublisher.Send(new AddExpenseEvent
+            await _addExpensePublisher.SendAsync(new AddExpenseEvent
             {
                 TransactionId = session.RequestId,
                 UserId = session.UserId,
@@ -165,8 +165,6 @@ public class ImportMoneyTransactionsService : IImportMoneyTransactionsService
                 Value = expense.Value
             });
         }
-
-        return Task.CompletedTask; 
     }
 
     private async Task ImportTransfersAsync(
@@ -202,7 +200,7 @@ public class ImportMoneyTransactionsService : IImportMoneyTransactionsService
                         session.Id);
                     throw new ImportDataException();
                 }
-                _addTransferPublisher.Send(new AddTransferEvent
+                await _addTransferPublisher.SendAsync(new AddTransferEvent
                 {
                     Id = Guid.NewGuid(),
                     TransactionId = session.RequestId,

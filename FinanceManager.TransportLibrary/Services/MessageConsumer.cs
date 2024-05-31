@@ -12,6 +12,7 @@ public abstract class MessageConsumer<TMessage, TRevertMessage>: AsyncEventingBa
     where TRevertMessage : class, IEvent
 
 {
+    private const int RetryMaxCount = 3;
     private readonly ILogger<MessageConsumer<TMessage, TRevertMessage>> _logger;
     private readonly IModel _channel;
     private readonly IMessagePublisher<TRevertMessage>? _revertMessagePublisher;
@@ -49,18 +50,38 @@ public abstract class MessageConsumer<TMessage, TRevertMessage>: AsyncEventingBa
             _logger.LogError("Message is null");
             return;
         }
-        await ExecuteEventAsync(message);
-        _channel.BasicAck(deliveryTag, false);
+
+        var attemptsCount = GetAttemptsCountFromProps(properties);
+        if (attemptsCount is > RetryMaxCount)
+        {
+            _logger.LogError(
+                "Maximum number of retry attempts exceeded for message from exchange {Exchange} and routing key {RoutingKey}",
+                exchange, routingKey);
+            _channel.BasicAck(deliveryTag, false);
+            return;
+        }
+
+        try
+        {
+            await ExecuteEventAsync(message);
+            _channel.BasicAck(deliveryTag, false);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e,"Consuming message for exchange {Exchange} and routing key {RoutingKey} error: {ErrorMessage}",
+                exchange, routingKey, e.Message);
+            _channel.BasicNack(deliveryTag, false, false);
+        }
     }
 
     public abstract Task ExecuteEventAsync(TMessage message);
 
-    protected Task RejectEventAsync(TMessage message)
+    protected async Task RejectEventAsync(TMessage message)
     {
         var rejeectableEvenMessage = message as IRejectableEvent;
         if (rejeectableEvenMessage == null || _revertMessagePublisher == null)
         {
-            return Task.CompletedTask;
+            return;
         }
         _logger.LogInformation(
             "Publish revert message {MessageType} with transaction id {TransactionId}",
@@ -68,8 +89,22 @@ public abstract class MessageConsumer<TMessage, TRevertMessage>: AsyncEventingBa
             message.TransactionId);
         if (rejeectableEvenMessage.GetRejectEvent() is TRevertMessage rejectEvent)
         {
-            _revertMessagePublisher.Send(rejectEvent);
+            await _revertMessagePublisher.SendAsync(rejectEvent);
         }
-        return Task.CompletedTask;
+    }
+
+    private long? GetAttemptsCountFromProps(IBasicProperties properties)
+    {
+        var deathProperties = properties.Headers?["x-death"] as List<object>;
+        if (deathProperties != null && deathProperties.Any())
+        {
+            var reasonDictionary = deathProperties.First() as Dictionary<string, object>;
+            if (reasonDictionary != null && reasonDictionary.TryGetValue("count", out object? countObj))
+            {
+                return (long)countObj;
+            }
+        }
+
+        return null;
     }
 }

@@ -113,7 +113,7 @@ public class DepositService : IDepositService
             await _appDbContext.SaveChangesAsync();
             if (model.CategoryId != TransferConstants.TransferCategoryId)
             {
-                _changeAccountBalancePublisher.Send(new ChangeAccountBalanceEvent
+                await _changeAccountBalancePublisher.SendAsync(new ChangeAccountBalanceEvent
                 {
                     TransactionId = requestId,
                     AccountId = model.AccountId,
@@ -161,7 +161,7 @@ public class DepositService : IDepositService
         existed.Value = model.Value;
         _appDbContext.Deposits.Update(existed);
         await _appDbContext.SaveChangesAsync();
-        _changeAccountBalancePublisher.Send(new ChangeAccountBalanceEvent
+        await _changeAccountBalancePublisher.SendAsync(new ChangeAccountBalanceEvent
         {
             TransactionId = requestId,
             AccountId = model.AccountId,
@@ -202,7 +202,7 @@ public class DepositService : IDepositService
 
             _appDbContext.Deposits.RemoveRange(deposits);
             await _appDbContext.SaveChangesAsync();
-            _addDepositRejectPublisher.Send(new AddDepositRejectEvent
+            await _addDepositRejectPublisher.SendAsync(new AddDepositRejectEvent
             {
                 TransactionId = requestId
             });

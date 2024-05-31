@@ -14,7 +14,7 @@ public class Account
     public string? Icon { get; set; }
     public string? Description { get; set; }
 
-    public bool ValidateAndUpdateBalance(
+    public async Task<bool> ValidateAndUpdateBalanceAsync(
         AccountLimit[] limits,
         decimal changeValue,
         DateTime changeDate,
@@ -34,7 +34,7 @@ public class Account
                 accountId);
             if (userAddress != null)
             {
-                notificationSendPublisher.Send(new NotificationSendEvent
+                await notificationSendPublisher.SendAsync(new NotificationSendEvent
                 {
                     TransactionId = transactionId,
                     Type = NotificationType.Warning,
@@ -55,7 +55,7 @@ public class Account
                 .MinBy(x => x.LimitValue);
             if (notifyLimit != null && userAddress != null)
             {
-                notificationSendPublisher.Send(new NotificationSendEvent
+                await notificationSendPublisher.SendAsync(new NotificationSendEvent
                 {
                     TransactionId = transactionId,
                     Type = NotificationType.Warning,
@@ -79,7 +79,7 @@ public class Account
         }
 
         Balance = newBalanceValue;
-        changeStatisticsPublisher.Send(new ChangeStatisticsEvent
+        await changeStatisticsPublisher.SendAsync(new ChangeStatisticsEvent
         {
             TransactionId = transactionId,
             AccountId = accountId,
