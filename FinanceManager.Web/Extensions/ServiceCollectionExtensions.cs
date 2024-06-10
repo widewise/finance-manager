@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using System.Text;
 using FinanceManager.Web.Models;
 using FinanceManager.Web.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -29,6 +31,11 @@ public static class ServiceCollectionExtensions
 
         section.Bind(settings);
 
+        services.Configure<SecurityStampValidatorOptions>(options =>
+        {
+            options.ValidationInterval = TimeSpan.FromSeconds(10);
+        });
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
@@ -41,7 +48,29 @@ public static class ServiceCollectionExtensions
                     ValidAudience = Constants.ValidAudience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Key))
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var securityStamp = context.Principal.FindFirstValue("AspNet.Identity.SecurityStamp");
+                        if (string.IsNullOrEmpty(securityStamp))
+                        {
+                            context.Fail("Token security stamp mismatch");
+                        }
+                    }
+                };
+
             });
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(AuthPolicies.RequireAdmin, policy => policy.RequireRole(UserRole.Admin.DisplayName()));
+            options.AddPolicy(AuthPolicies.RequireUser, policy => policy.RequireRole(UserRole.User.DisplayName()));
+            options.AddPolicy(AuthPolicies.RequireCategoryRead, policy => policy.RequireClaim(AuthClaimTypes.Permission, AuthClaims.CategoryRead));
+            options.AddPolicy(AuthPolicies.RequireCategoryWrite, policy => policy.RequireClaim(AuthClaimTypes.Permission, AuthClaims.CategoryWrite));
+            options.AddPolicy(AuthPolicies.RequireCurrencyRead, policy => policy.RequireClaim(AuthClaimTypes.Permission, AuthClaims.CurrencyRead));
+            options.AddPolicy(AuthPolicies.RequireCurrencyWrite, policy => policy.RequireClaim(AuthClaimTypes.Permission, AuthClaims.CurrencyWrite));
+        });
 
         services.AddAuthorization();
         services.AddSwaggerWithAuthentication(serviceName, serviceVersion);

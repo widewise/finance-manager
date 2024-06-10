@@ -1,9 +1,11 @@
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Conventions;
 using FinanceManager.User;
+using FinanceManager.User.Migrations;
 using FinanceManager.User.Models;
 using FinanceManager.User.Services;
 using FinanceManager.Web;
@@ -20,26 +22,6 @@ builder.Configuration.AddJsonFile("secrets/appsettings.secrets.json", optional: 
 builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
-
-builder.Services.AddControllers();
-builder.Services.AddApiVersioning(options =>
-    {
-        options.DefaultApiVersion = new ApiVersion(1.0);
-        options.AssumeDefaultVersionWhenUnspecified = true;
-        options.ReportApiVersions = true;
-    })
-    .AddMvc(
-        options =>
-        {
-            // automatically applies an api version based on the name of
-            // the defining controller's namespace
-            options.Conventions.Add(new VersionByNamespaceConvention());
-        })
-    .AddApiExplorer();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerWithAuthentication("User API");
-builder.Services.ConfigureOptions<NamedSwaggerGenOptions<Program>>();
-
 var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (dbConnectionString == null)
 {
@@ -49,6 +31,7 @@ if (dbConnectionString == null)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(dbConnectionString));
 
+builder.Services.AddTransient<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddIdentity<User, CustomIdentityRole>(options =>
     {
@@ -99,6 +82,11 @@ if (string.IsNullOrEmpty(apiSecurityKey))
 {
     throw new Exception("API security key is null or empty");
 }
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.FromSeconds(10);
+});
+
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -110,7 +98,42 @@ builder.Services
             ValidAudience = Constants.ValidAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(apiSecurityKey))
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
+                var user = await userManager.GetUserAsync(context.Principal!);
+                if (user != null)
+                {
+                    var securityStamp = context.Principal.FindFirstValue("AspNet.Identity.SecurityStamp");
+                    if (securityStamp != user.SecurityStamp)
+                    {
+                        context.Fail("Token security stamp mismatch");
+                    }
+                }
+            }
+        };
     });
+
+builder.Services.AddControllers();
+builder.Services.AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1.0);
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ReportApiVersions = true;
+    })
+    .AddMvc(
+        options =>
+        {
+            // automatically applies an api version based on the name of
+            // the defining controller's namespace
+            options.Conventions.Add(new VersionByNamespaceConvention());
+        })
+    .AddApiExplorer();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerWithAuthentication("User API");
+builder.Services.ConfigureOptions<NamedSwaggerGenOptions<Program>>();
 
 var app = builder.Build();
 
@@ -124,6 +147,8 @@ var dbContext = scope.ServiceProvider
     .GetRequiredService<AppDbContext>();
 
 dbContext.Database.Migrate();
+var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+await dbInitializer.InitializeAsync();
 
 logger.LogInformation("DB migrated");
 
