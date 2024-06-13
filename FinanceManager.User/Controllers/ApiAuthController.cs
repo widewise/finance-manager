@@ -1,6 +1,8 @@
-﻿using Asp.Versioning;
+﻿using System.Security.Claims;
+using Asp.Versioning;
 using FinanceManager.User.Models;
 using FinanceManager.User.Services;
+using FinanceManager.Web.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,17 +15,20 @@ public class ApiAuthController : ControllerBase
 {
     private readonly ILogger<ApiAuthController> _logger;
     private readonly UserManager<Models.User> _userManager;
+    private readonly RoleManager<CustomIdentityRole> _roleManager;
     private readonly ITokenService _tokenService;
     private readonly AppDbContext _context;
 
     public ApiAuthController(
         ILogger<ApiAuthController> logger,
         UserManager<Models.User> userManager,
+        RoleManager<CustomIdentityRole> roleManager,
         ITokenService tokenService,
         AppDbContext context)
     {
         _logger = logger;
         _userManager = userManager;
+        _roleManager = roleManager;
         _tokenService = tokenService;
         _context = context;
     }
@@ -37,12 +42,16 @@ public class ApiAuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var result = await _userManager.CreateAsync(
-            new Models.User { UserName = request.Username, Email = request.Email },
-            request.Password
-        );
+        var user = new Models.User
+        {
+            UserName = request.Username,
+            Email = request.Email
+        };
+        var result = await _userManager.CreateAsync(user, request.Password);
         if (result.Succeeded)
         {
+            await _userManager.AddToRoleAsync(user, request.Role.DisplayName());
+            await _userManager.AddClaimAsync(user, new Claim(request.Role.DisplayName(), "true"));
             request.Password = string.Empty;
             return CreatedAtAction(nameof(Register), new {email = request.Email}, request);
         }
@@ -83,7 +92,22 @@ public class ApiAuthController : ControllerBase
             return Unauthorized();
         }
 
-        var accessToken = _tokenService.CreateToken(userInDb);
+        var userRoles = await _userManager.GetRolesAsync(managedUser);
+        var userClaims = new List<Claim>();
+        foreach (var userRole in userRoles)
+        {
+            var role = await _roleManager.FindByNameAsync(userRole);
+            if (role == null)
+            {
+                continue;
+            }
+            userClaims.AddRange(await _roleManager.GetClaimsAsync(role));
+        }
+
+        var accessToken = _tokenService.CreateToken(
+            userInDb,
+            userRoles.ToArray(),
+            userClaims.DistinctBy(x => x.Value).ToArray());
         await _context.SaveChangesAsync();
         return Ok(new AuthResponseModel
         {

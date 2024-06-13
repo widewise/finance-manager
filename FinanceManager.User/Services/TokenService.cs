@@ -8,7 +8,7 @@ namespace FinanceManager.User.Services;
 
 public interface ITokenService
 {
-    string CreateToken(Models.User user);
+    string CreateToken(Models.User user, string[] roles, Claim[] claims);
 }
 
 public class TokenService: ITokenService
@@ -25,11 +25,11 @@ public class TokenService: ITokenService
         _configuration = configuration;
     }
 
-    public string CreateToken(Models.User user)
+    public string CreateToken(Models.User user, string[] roles, Claim[] claims)
     {
         var expiration = DateTime.UtcNow.AddMinutes(ExpirationMinutes);
         var token = CreateJwtToken(
-            CreateClaims(user),
+            CreateClaims(user, roles, claims),
             CreateSigningCredentials(),
             expiration
         );
@@ -47,7 +47,7 @@ public class TokenService: ITokenService
             signingCredentials: credentials
         );
 
-    private List<Claim> CreateClaims(Models.User user)
+    private List<Claim> CreateClaims(Models.User user, IList<string> roles, Claim[] otherClaims)
     {
         try
         {
@@ -55,8 +55,12 @@ public class TokenService: ITokenService
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Name, user.UserName),
-                new(ClaimTypes.Email, user.Email)
+                new(ClaimTypes.Email, user.Email),
+                new("AspNet.Identity.SecurityStamp", user.SecurityStamp)
             };
+            claims.AddRange(roles.Select(
+                role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
+            claims.AddRange(otherClaims);
             return claims;
         }
         catch (Exception e)

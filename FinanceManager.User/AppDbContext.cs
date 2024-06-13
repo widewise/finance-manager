@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using FinanceManager.User.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceManager.User;
 
-public class AppDbContext : IdentityUserContext<Models.User, long>
+public class AppDbContext : IdentityDbContext<Models.User, CustomIdentityRole, long>
 {
     private readonly IConfiguration _configuration;
 

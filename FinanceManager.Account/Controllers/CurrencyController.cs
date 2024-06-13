@@ -46,7 +46,7 @@ public class CurrencyController : BaseController
     /// <returns>The <see cref="Currency"/> collection</returns>
     /// <response code="200">Returns currencies collection</response>
     /// <response code="400">Returns if user identifier in token isn't set</response>
-    [Authorize]
+    [Authorize(Policy = AuthPolicies.RequireCurrencyRead)]
     [MapToApiVersion(1.0)]
     [HttpGet(Name = ApiNameConstants.GetCurrencyV1)]
     [ProducesResponseType(typeof(IEnumerable<Currency>), StatusCodes.Status200OK)]
@@ -74,7 +74,7 @@ public class CurrencyController : BaseController
     /// <returns>The <see cref="CurrencyResponse"/> collection</returns>
     /// <response code="200">Returns currencies collection</response>
     /// <response code="400">Returns if user identifier in token isn't set</response>
-    [Authorize]
+    [Authorize(Policy = AuthPolicies.RequireCurrencyRead)]
     [MapToApiVersion(2.0)]
     [HttpGet(Name = ApiNameConstants.GetCurrencyV2)]
     [ProducesResponseType(typeof(IEnumerable<CurrencyResponse>), StatusCodes.Status200OK)]
@@ -105,7 +105,7 @@ public class CurrencyController : BaseController
     /// <returns>The <see cref="Currency"/> model</returns>
     /// <response code="200">Returns <see cref="Currency"/> model</response>
     /// <response code="400">Returns if user identifier in token isn't set</response>
-    [Authorize]
+    [Authorize(Policy = AuthPolicies.RequireCurrencyWrite)]
     [MapToApiVersion(1.0)]
     [HttpPost(Name = ApiNameConstants.CreateCurrencyV1)]
     [ProducesResponseType(typeof(CurrencyResponse), StatusCodes.Status201Created)]
@@ -137,7 +137,7 @@ public class CurrencyController : BaseController
     /// <returns>The <see cref="CurrencyResponse"/> model</returns>
     /// <response code="201">Returns <see cref="CurrencyResponse"/> model</response>
     /// <response code="400">Returns if user identifier in token isn't set</response>
-    [Authorize]
+    [Authorize(Policy = AuthPolicies.RequireCurrencyWrite)]
     [MapToApiVersion(2.0)]
     [HttpPost(Name = ApiNameConstants.CreateCurrencyV2)]
     [ProducesResponseType(typeof(CurrencyResponse), StatusCodes.Status201Created)]
@@ -211,7 +211,7 @@ public class CurrencyController : BaseController
     /// <param name="id">The <see cref="Currency"/> identifier</param>
     /// <response code="204">If <see cref="Currency"/> with identifier from parameters is deleted</response>
     /// <response code="400">Returns if some problems during operation happen</response>
-    [Authorize]
+    [Authorize(Policy = AuthPolicies.RequireCurrencyWrite)]
     [HttpDelete("{id}", Name = ApiNameConstants.DeleteCurrency)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
