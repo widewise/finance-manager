@@ -15,7 +15,7 @@ public class BaseController : ControllerBase
 
     private string GetSupportedHttpMethods()
     {
-        var methods = new List<string> { "OPTIONS" };
+        var methods = new List<string> { "OPTION" };
         var userIsAuthorized = User.Identity?.IsAuthenticated ?? false;
 
         var currentControllerType = GetType();
