@@ -7,5 +7,6 @@ public class Message
     public string? Content { get; set; }
     public DateTime OccuredAt { get; set; }
     public DateTime? ProcessedAt { get; set; }
+    public int AttemptCount { get; set; }
     public string? Error { get; set; }
 }

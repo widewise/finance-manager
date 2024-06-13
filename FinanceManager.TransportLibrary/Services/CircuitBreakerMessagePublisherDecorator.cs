@@ -30,8 +30,14 @@ public class CircuitBreakerMessagePublisherDecorator<TMessage> : IMessagePublish
 
         void OnReset(Context _) => _logger.LogInformation("Circuit breaker for sending via RabbitMQ was reset");
 
+        // overflow queue isn't processed by specific exception time, but
+        // there are some exceptions or error messages that indicate the queue is full,
+        // which would be handled under OperationInterruptedException.
         _sendMessageBreaker = Policy
-            .Handle<AlreadyClosedException>()
+            .Handle<BrokerUnreachableException>()
+            .Or<OperationInterruptedException>()
+            .Or<AlreadyClosedException>()
+            .Or<ChannelAllocationException>()
             .CircuitBreakerAsync(ExceptionsAllowedBeforeBreaking, BlockTimeout, OnBreak, OnReset);
 
     }

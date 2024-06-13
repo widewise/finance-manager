@@ -25,13 +25,14 @@ public class MessageRepository : IMessageRepository, IAsyncDisposable
     {
         CheckDbConnection();
         await _dbConnection!.ExecuteAsync(
-            @"INSERT INTO ""OutboxMessages""(""Id"", ""OccuredAt"", ""Type"", ""Content"") VALUES (@Id, @OccuredAt, @Type, @Content)",
+            @"INSERT INTO ""OutboxMessages""(""Id"", ""OccuredAt"", ""Type"", ""Content"", ""AttemptCount"") VALUES (@Id, @OccuredAt, @Type, @Content, @AttemptCount)",
             new
             {
                 Id = Guid.NewGuid(),
                 OccuredAt = DateTime.UtcNow,
                 Type = type,
-                Content = content
+                Content = content,
+                AttemptCount = 0
             });
     }
 
@@ -39,12 +40,13 @@ public class MessageRepository : IMessageRepository, IAsyncDisposable
     {
         CheckDbConnection();
         await _dbConnection!.ExecuteAsync(
-            @"UPDATE ""OutboxMessages"" SET ""ProcessedAt""=@ProcessedAt, ""Error""=@Error WHERE ""Id""=@Id",
+            @"UPDATE ""OutboxMessages"" SET ""ProcessedAt""=@ProcessedAt, ""Error""=@Error, ""AttemptCount""=@AttemptCount WHERE ""Id""=@Id",
             new
             {
                 message.Id,
                 message.ProcessedAt,
-                message.Error
+                message.Error,
+                message.AttemptCount
             });
     }
 
