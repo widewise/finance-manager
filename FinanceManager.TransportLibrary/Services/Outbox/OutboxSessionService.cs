@@ -35,6 +35,11 @@ public class OutboxSessionService : IOutboxSessionService
         foreach (var outboxMessage in messages)
         {
             var tMessage = Type.GetType(outboxMessage.Type);
+            if (tMessage == null)
+            {
+                _logger.LogError("Type of message isn't recognized");
+                throw new ArgumentNullException(nameof(tMessage));
+            }
             var message = outboxMessage.Content != null ? JsonConvert.DeserializeObject(outboxMessage.Content, tMessage) : null;
             var publisherType  = typeof(MessagePublisher<>);
             var genericPublisherType = publisherType.MakeGenericType(tMessage);

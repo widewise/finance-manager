@@ -10,15 +10,15 @@ public class MessageTransportSettings
     /// <summary>
     /// Host name
     /// </summary>
-    public string Hostname { get; set; }
+    public string Hostname { get; set; } = null!;
 
     /// <summary>
     /// User name
     /// </summary>
-    public string User { get; set; }
+    public string User { get; set; } = null!;
 
     /// <summary>
     /// Password
     /// </summary>
-    public string Password { get; set; }
+    public string Password { get; set; } = null!;
 }

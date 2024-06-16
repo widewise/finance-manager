@@ -4,9 +4,6 @@ using AutoMapper;
 using FinanceManager.Account.Domain;
 using FinanceManager.Account.Models;
 using FinanceManager.Account.Services;
-using FinanceManager.TransportLibrary;
-using FinanceManager.TransportLibrary.Extensions;
-using FinanceManager.TransportLibrary.Services;
 using FinanceManager.Web;
 using FinanceManager.Web.Extensions;
 using FinanceManager.Web.Services;
@@ -45,8 +42,8 @@ public class CategoryController : BaseController
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         var categories = await _categoryService.GetAsync(new CategoryQueryParameters
@@ -84,8 +81,8 @@ public class CategoryController : BaseController
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         var category = await _categoryService.CreateAsync(model, currentUserId, requestId);

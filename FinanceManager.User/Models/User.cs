@@ -6,7 +6,7 @@ namespace FinanceManager.User.Models;
 public class User: IdentityUser<long>
 {
     [NotMapped]
-    public string Username
+    public string? Username
     {
         get => base.UserName;
         set => base.UserName = value;
@@ -16,7 +16,7 @@ public class User: IdentityUser<long>
     public string? LastName { get; set; }
 
     [NotMapped]
-    public string Phone
+    public string? Phone
     {
         get => base.PhoneNumber;
         set => base.PhoneNumber = value;

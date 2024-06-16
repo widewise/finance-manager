@@ -66,8 +66,8 @@ public class ExpenseController : ControllerBase
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         if (!HttpContext.HasUserAddress(out var userAddress))

@@ -150,7 +150,7 @@ public class TransferService : ITransferService
         var existed = await _appDbContext.Transfers.FirstOrDefaultAsync(x => x.Id == id);
         if (existed == null)
         {
-            _logger.LogWarning("Transfer with id {d} is not found", id);
+            _logger.LogWarning("Transfer with id {Id} is not found", id);
             return false;
         }
 
@@ -165,7 +165,7 @@ public class TransferService : ITransferService
         var existed = await _appDbContext.Transfers.FirstOrDefaultAsync(x => x.Id == id);
         if (existed == null)
         {
-            _logger.LogWarning("Transfer with id {d} is not found", id);
+            _logger.LogWarning("Transfer with id {Id} is not found", id);
             return false;
         }
 

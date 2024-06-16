@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using FinanceManager.User.Models;
+using FinanceManager.Web;
 using FinanceManager.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -31,8 +32,8 @@ public class UserController : ControllerBase
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         if (userId != currentUserId)
@@ -95,8 +96,8 @@ public class UserController : ControllerBase
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         var existedUser = await _userManager.FindByIdAsync(currentUserId.ToString());

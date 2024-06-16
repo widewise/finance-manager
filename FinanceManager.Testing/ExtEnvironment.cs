@@ -12,12 +12,12 @@ namespace FinanceManager.Testing;
 public class ExtEnvironment
 {
     private static DockerClient? _dockerClient;
-    public static PostgresContainer PostgresContainer { get; set; }
-    public static MountebankContainer MountebankContainer { get; set; }
-    public static RabbitmqContainer RabbitmqContainer { get; set; }
-    public static TestServer TestServer { get; private set; }
+    public static PostgresContainer PostgresContainer { get; set; } = null!;
+    public static MountebankContainer MountebankContainer { get; set; } = null!;
+    public static RabbitmqContainer RabbitmqContainer { get; set; } = null!;
+    public static TestServer TestServer { get; private set; } = null!;
     public static MountebankClient MountebankClient { get; private set; } = new(new Uri("http://localhost:2525"));
-    public static RabbitMqClient RabbitMqClient { get; private set; }
+    public static RabbitMqClient RabbitMqClient { get; private set; } = null!;
 
     public static async Task Start<TEntryPoint>(
         int authPort,

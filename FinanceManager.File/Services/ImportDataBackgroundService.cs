@@ -18,7 +18,7 @@ public class ImportDataBackgroundService: BackgroundService
   }
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
-    _logger.LogInformation($"{nameof(ImportDataBackgroundService)} is started");
+    _logger.LogInformation("{ServiceName} is started", nameof(ImportDataBackgroundService));
     while (!stoppingToken.IsCancellationRequested)
     {
       //TODO: exclude to config
@@ -29,7 +29,7 @@ public class ImportDataBackgroundService: BackgroundService
       }
       await DoWorkAsync();
     }
-    _logger.LogInformation($"{nameof(ImportDataBackgroundService)} is stopped");
+    _logger.LogInformation("{ServiceName} is stopped", nameof(ImportDataBackgroundService));
   }
 
   private async Task DoWorkAsync()
@@ -42,7 +42,7 @@ public class ImportDataBackgroundService: BackgroundService
       if (!locker.IsAcquired)
       {
         _logger.LogInformation(
-          $"{nameof(ImportDataBackgroundService)} execution has already started by another instance");
+          "{ServiceName} execution has already started by another instance", nameof(ImportDataBackgroundService));
         return;
       }
 

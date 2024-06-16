@@ -31,7 +31,7 @@ public class JwtTokenBuilder
         return tokenString;
     }
 
-    private JwtSecurityToken CreateJwtToken(List<Claim> claims, SigningCredentials credentials,
+    private static JwtSecurityToken CreateJwtToken(List<Claim> claims, SigningCredentials credentials,
         DateTime expiration) =>
         new(
             Constants.ValidIssuer,

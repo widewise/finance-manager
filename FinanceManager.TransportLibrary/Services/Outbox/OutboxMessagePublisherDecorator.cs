@@ -34,7 +34,7 @@ public class OutboxMessagePublisherDecorator<TMessage> : IMessagePublisher<TMess
                 e.Message);
             await _messageRepository.AddAsync(
                 $"{typeof(TMessage).FullName}, {typeof(TMessage).Assembly.FullName}",
-                message != null ? JsonConvert.SerializeObject(message) : null);
+                EqualityComparer<TMessage>.Default.Equals(message, default) ? JsonConvert.SerializeObject(message) : null);
         }
     }
 }

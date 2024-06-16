@@ -4,5 +4,5 @@ namespace FinanceManager.Events.Models;
 
 public class AddTransferRejectEvent : IEvent
 {
-    public string TransactionId { get; set; }
+    public string TransactionId { get; set; } = null!;
 }

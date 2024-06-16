@@ -19,7 +19,7 @@ public class AppDbContext: DbContext
     public DbSet<Models.BalanceLevelStatistics> BalanceLevelStatistics { get; set; }
     public DbSet<Models.CategoryTotalTimeStatistics> CategoryTotalTimeStatistics { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
     }
 }

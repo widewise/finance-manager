@@ -2,14 +2,14 @@
 
 public static class FinanceIdentityConstants
 {
-    public static string AccountAudience = "account";
-    public static string AccountTitle = "Account API";
-    public static string DepositAudience = "deposit";
-    public static string DepositTitle = "Deposit API";
-    public static string ExpenseAudience = "expense";
-    public static string ExpenseTitle = "Expense API";
-    public static string TransferAudience = "transfer";
-    public static string TransferTitle = "Transfer API";
-    public static string FileAudience = "file";
-    public static string FileTitle = "File API";
+    public const string AccountAudience = "account";
+    public const string AccountTitle = "Account API";
+    public const string DepositAudience = "deposit";
+    public const string DepositTitle = "Deposit API";
+    public const string ExpenseAudience = "expense";
+    public const string ExpenseTitle = "Expense API";
+    public const string TransferAudience = "transfer";
+    public const string TransferTitle = "Transfer API";
+    public const string FileAudience = "file";
+    public const string FileTitle = "File API";
 }

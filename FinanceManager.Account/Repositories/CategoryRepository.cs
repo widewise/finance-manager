@@ -23,8 +23,6 @@ public interface ICategoryRepository : IUnitOfWorkRepository
 
 public class CategorySpecification
 {
-    public CategorySpecification() { }
-
     public CategorySpecification(
         Guid? id = null,
         Guid? parentId = null,

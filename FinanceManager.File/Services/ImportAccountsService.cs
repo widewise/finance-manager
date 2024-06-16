@@ -36,24 +36,24 @@ public class ImportAccountsService : IImportAccountsService
             .Select(x => new
             {
                 Account = x.ToAccountName,
-                CurrencyId = currencies[x.ToCurrencyName]
+                CurrencyId = currencies[x.ToCurrencyName!]
             })
             .Union(fileItems
                 .Where(x => !string.IsNullOrEmpty(x.FromAccountName) && !string.IsNullOrEmpty(x.FromCurrencyName))
                 .Select(x => new
             {
                 Account = x.FromAccountName,
-                CurrencyId = currencies[x.FromCurrencyName]
+                CurrencyId = currencies[x.FromCurrencyName!]
             }))
             .ToDictionary(x => x.Account, x => x.CurrencyId);
         var externalItems = await _restClient.GetAccountsByTransactionIdAsync(null, session.RequestId);
         var result = externalItems.ToDictionary(x => x.Name, x => x.Id);
 
         var modelsToAdd = items
-            .Where(x => !result.ContainsKey(x.Key))
+            .Where(x => x.Key != null && !result.ContainsKey(x.Key))
             .Select(x => new CreateAccountModel
             {
-                Name = x.Key,
+                Name = x.Key!,
                 CurrencyId = x.Value,
                 Description = $"Imported from file {fileName}"
             })

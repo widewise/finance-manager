@@ -144,7 +144,7 @@ public class DepositService : IDepositService
         var existed = await _appDbContext.Deposits.FirstOrDefaultAsync(x => x.Id == id);
         if (existed == null)
         {
-            _logger.LogWarning("Deposit with id {d} is not found", id);
+            _logger.LogWarning("Deposit with id {Id} is not found", id);
             return false;
         }
 
@@ -179,7 +179,7 @@ public class DepositService : IDepositService
         var existed = await _appDbContext.Deposits.FirstOrDefaultAsync(x => x.Id == id);
         if (existed == null)
         {
-            _logger.LogWarning("Deposit with id {d} is not found", id);
+            _logger.LogWarning("Deposit with id {Id} is not found", id);
             return false;
         }
 

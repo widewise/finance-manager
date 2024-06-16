@@ -37,11 +37,11 @@ public class ImportCurrenciesService : IImportCurrenciesService
         var result = externalItems.ToDictionary(x => x.Name, x => x.Id);
 
         var modelsToAdd = items
-            .Where(x => !result.ContainsKey(x))
+            .Where(x => x != null && !result.ContainsKey(x))
             .Select(x => new CreateCurrencyModel
             {
-                Name = x,
-                ShortName = x
+                Name = x!,
+                ShortName = x!
             })
             .ToArray();
         if (!modelsToAdd.Any())

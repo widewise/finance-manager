@@ -16,7 +16,8 @@ public class Token
     public long RefreshExpiresIn { get; set; }
     [JsonProperty("refresh_token")]
     [JsonPropertyName("refresh_token")]
-    public string RefreshToken { get; set; }
+    public string RefreshToken { get; set; } = null!;
+
     [JsonProperty("token_type")]
     [JsonPropertyName("token_type")]
     public string TokenType { get; set; } = null!;
@@ -28,5 +29,5 @@ public class Token
     public Guid SessionState { get; set; }
     [JsonProperty("scope")]
     [JsonPropertyName("scope")]
-    public string Scope { get; set; }
+    public string Scope { get; set; } = null!;
 }

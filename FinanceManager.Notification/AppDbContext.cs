@@ -18,9 +18,9 @@ public class AppDbContext: DbContext
 
     public DbSet<Models.Notification> Notifications { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        builder.Entity<Models.Notification>()
+        modelBuilder.Entity<Models.Notification>()
             .Property(f => f.Id)
             .ValueGeneratedOnAdd();
     }

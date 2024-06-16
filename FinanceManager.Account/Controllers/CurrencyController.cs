@@ -56,8 +56,8 @@ public class CurrencyController : BaseController
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         return Ok(await _currencyService.GetAsync(new CurrencyQueryParameters
@@ -84,8 +84,8 @@ public class CurrencyController : BaseController
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         var currencies = await _currencyService.GetAsync(new CurrencyQueryParameters
@@ -116,8 +116,8 @@ public class CurrencyController : BaseController
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         var currency = await _currencyService.CreateAsync(requestId, currentUserId, model);
@@ -148,8 +148,8 @@ public class CurrencyController : BaseController
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         var currency = await _currencyService.CreateAsync(requestId, currentUserId, model);
@@ -219,8 +219,8 @@ public class CurrencyController : BaseController
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         var res = await _currencyService.DeleteAsync(id, currentUserId);

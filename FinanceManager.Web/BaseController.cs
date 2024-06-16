@@ -33,7 +33,7 @@ public class BaseController : ControllerBase
         return string.Join(", ", methods.Distinct());
     }
 
-    private string GetHttpMethod(MethodInfo methodInfo, bool userIsAuthorized, bool hasDefaultAuth)
+    private static string GetHttpMethod(MethodInfo methodInfo, bool userIsAuthorized, bool hasDefaultAuth)
     {
         var attributes = methodInfo.GetCustomAttributes().ToArray();
         if (!MethodAuthCheck(attributes, userIsAuthorized, hasDefaultAuth))
@@ -67,7 +67,7 @@ public class BaseController : ControllerBase
         return string.Empty;
     }
 
-    private bool MethodAuthCheck(IEnumerable<Attribute> attributes, bool userIsAuthorized, bool hasDefaultAuth)
+    private static bool MethodAuthCheck(IEnumerable<Attribute> attributes, bool userIsAuthorized, bool hasDefaultAuth)
     {
         if (userIsAuthorized)
         {

@@ -38,14 +38,14 @@ public abstract class MessageConsumer<TMessage, TRevertMessage>: AsyncEventingBa
         ReadOnlyMemory<byte> body)
     {
         _logger.LogInformation("Consuming Message");
-        _logger.LogInformation(string.Concat("Message received from the exchange ", exchange));
-        _logger.LogInformation(string.Concat("Consumer tag: ", consumerTag));
-        _logger.LogInformation(string.Concat("Delivery tag: ", deliveryTag));
-        _logger.LogInformation(string.Concat("Routing tag: ", routingKey));
+        _logger.LogInformation("Message received from the exchange {Exchange}", exchange);
+        _logger.LogInformation("Consumer tag: {ConsumerTag}", consumerTag);
+        _logger.LogInformation("Delivery tag: {DeliveryTag}", deliveryTag);
+        _logger.LogInformation("Routing tag: {RoutingKey}", routingKey);
         var messageString = Encoding.UTF8.GetString(body.ToArray());
-        _logger.LogInformation(string.Concat("Message: ", messageString));
+        _logger.LogInformation("Message: {Message}", messageString);
         var message = JsonSerializer.Deserialize<TMessage>(messageString);
-        if (message == null)
+        if (EqualityComparer<TMessage>.Default.Equals(message, default))
         {
             _logger.LogError("Message is null");
             return;
@@ -63,7 +63,7 @@ public abstract class MessageConsumer<TMessage, TRevertMessage>: AsyncEventingBa
 
         try
         {
-            await ExecuteEventAsync(message);
+            await ExecuteEventAsync(message!);
             _channel.BasicAck(deliveryTag, false);
         }
         catch (Exception e)
@@ -93,7 +93,7 @@ public abstract class MessageConsumer<TMessage, TRevertMessage>: AsyncEventingBa
         }
     }
 
-    private long? GetAttemptsCountFromProps(IBasicProperties properties)
+    private static long? GetAttemptsCountFromProps(IBasicProperties properties)
     {
         var deathProperties = properties.Headers?["x-death"] as List<object>;
         if (deathProperties != null && deathProperties.Any())

@@ -20,15 +20,15 @@ public class FileAppDbContext: DbContext
     public DbSet<Models.ExportSession> ExportSessions { get; set; } = null!;
     public DbSet<Models.File> Files { get; set; } = null!;
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        builder.Entity<Models.ImportSession>()
+        modelBuilder.Entity<Models.ImportSession>()
             .Property(f => f.Id)
             .ValueGeneratedOnAdd();
-        builder.Entity<Models.ExportSession>()
+        modelBuilder.Entity<Models.ExportSession>()
             .Property(f => f.Id)
             .ValueGeneratedOnAdd();
-        builder.Entity<Models.File>()
+        modelBuilder.Entity<Models.File>()
             .Property(f => f.Id)
             .ValueGeneratedOnAdd();
     }

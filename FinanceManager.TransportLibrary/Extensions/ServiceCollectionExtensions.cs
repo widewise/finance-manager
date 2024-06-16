@@ -95,7 +95,7 @@ public static class ServiceCollectionExtensions
             var consumer = serviceProvider.GetRequiredService(info.Consumer) as IBasicConsumer;
             if (consumer == null)
             {
-                throw new Exception("Run consumers exception");
+                throw new ArgumentException("Run consumers exception");
             }
 
             channel.BasicConsume(

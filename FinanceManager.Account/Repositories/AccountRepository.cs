@@ -22,7 +22,6 @@ public interface IAccountRepository : IUnitOfWorkRepository
 
 public class AccountSpecification
 {
-    public AccountSpecification() { }
     public AccountSpecification(
         Guid? id = null,
         long? userId = null,

@@ -109,7 +109,7 @@ public class CategoryService: ICategoryService
         var existed = (await _categoryRepository.GetAsync(new CategorySpecification(id: id))).FirstOrDefault();
         if (existed == null)
         {
-            _logger.LogWarning("Category with id {d} is not found", id);
+            _logger.LogWarning("Category with id {Id} is not found", id);
             return false;
         }
 
@@ -121,7 +121,7 @@ public class CategoryService: ICategoryService
 
         if (await _categoryRepository.CheckExistAsync(new CategorySpecification(parentId: existed.Id)))
         {
-            _logger.LogWarning("Category with id {d} has children", id);
+            _logger.LogWarning("Category with id {Id} has children", id);
             return false;
         }
 

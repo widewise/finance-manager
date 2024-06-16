@@ -65,12 +65,26 @@ public class ImportMoneyTransactionsService : IImportMoneyTransactionsService
                         string.IsNullOrEmpty(x.FromAccountName) &&
                         string.IsNullOrEmpty(x.FromCategoryName) &&
                         !x.FromValue.HasValue)
-            .Select(x => new
+            .Select(x =>
             {
-                AccountId = accounts.ContainsKey(x.ToAccountName!) ? (Guid?)accounts[x.ToAccountName!] : null,
-                CategoryId = categories.ContainsKey(x.ToCategoryName!) ? (Guid?)categories[x.ToCategoryName!] : null,
-                x.ToValue!.Value,
-                x.Date
+                Guid? accountId = null;
+                if(accounts.TryGetValue(x.ToAccountName!, out Guid val1))
+                {
+                    accountId = val1;
+                }
+
+                Guid? categoryId = null;
+                if (categories.TryGetValue(x.ToCategoryName!, out Guid val2))
+                {
+                    categoryId = val2;
+                }
+                return new
+                {
+                    AccountId = accountId,
+                    CategoryId = categoryId,
+                    x.ToValue!.Value,
+                    x.Date
+                };
             })
             .ToArray();
         var externalDeposits = await _restClient.GetDepositsByTransactionIdAsync(null, session.RequestId);
@@ -138,12 +152,27 @@ public class ImportMoneyTransactionsService : IImportMoneyTransactionsService
                         string.IsNullOrEmpty(x.ToAccountName) &&
                         string.IsNullOrEmpty(x.ToCategoryName) &&
                         !x.ToValue.HasValue)
-            .Select(x => new
+            .Select(x =>
             {
-                AccountId = accounts.ContainsKey(x.FromAccountName!) ? (Guid?)accounts[x.FromAccountName!] : null,
-                CategoryId = categories.ContainsKey(x.FromCategoryName!) ? (Guid?)categories[x.FromCategoryName!] : null,
-                x.FromValue!.Value,
-                x.Date
+                Guid? accountId = null;
+                if(accounts.TryGetValue(x.FromAccountName!, out Guid val1))
+                {
+                    accountId = val1;
+                }
+
+                Guid? categoryId = null;
+                if (categories.TryGetValue(x.FromCategoryName!, out Guid val2))
+                {
+                    categoryId = val2;
+                }
+
+                return new
+                {
+                    AccountId = accountId,
+                    CategoryId = categoryId,
+                    x.FromValue!.Value,
+                    x.Date
+                };
             })
             .ToArray();
         foreach (var expense in expenses)
@@ -177,15 +206,29 @@ public class ImportMoneyTransactionsService : IImportMoneyTransactionsService
                         x.FromValue > 0 &&
                         !string.IsNullOrEmpty(x.ToAccountName) &&
                         x.ToValue > 0)
-            .Select(x => new
+            .Select(x =>
             {
-                FromAccountId = accounts.ContainsKey(x.FromAccountName!) ? (Guid?)accounts[x.FromAccountName!] : null,
-                FromValue = x.FromValue!.Value,
-                ToAccountId = accounts.ContainsKey(x.ToAccountName!) ? (Guid?)accounts[x.ToAccountName!] : null,
-                ToValue = x.ToValue!.Value,
-                x.Date,
-                x.Description
-                
+                Guid? fromAccountId = null;
+                if(accounts.TryGetValue(x.FromAccountName!, out Guid val1))
+                {
+                    fromAccountId = val1;
+                }
+
+                Guid? toAccountName = null;
+                if (accounts.TryGetValue(x.ToAccountName!, out Guid val2))
+                {
+                    toAccountName = val2;
+                }
+
+                return new
+                {
+                    FromAccountId = fromAccountId,
+                    FromValue = x.FromValue!.Value,
+                    ToAccountId = toAccountName,
+                    ToValue = x.ToValue!.Value,
+                    x.Date,
+                    x.Description
+                };
             })
             .ToArray();
         var externalTransfers = await _restClient.GetTransfersByTransactionIdAsync(null, session.RequestId);

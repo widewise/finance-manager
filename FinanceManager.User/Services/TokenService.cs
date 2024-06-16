@@ -37,7 +37,7 @@ public class TokenService: ITokenService
         return tokenHandler.WriteToken(token);
     }
 
-    private JwtSecurityToken CreateJwtToken(List<Claim> claims, SigningCredentials credentials,
+    private static JwtSecurityToken CreateJwtToken(List<Claim> claims, SigningCredentials credentials,
         DateTime expiration) =>
         new(
             Constants.ValidIssuer,
@@ -54,8 +54,8 @@ public class TokenService: ITokenService
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Name, user.UserName),
-                new(ClaimTypes.Email, user.Email)
+                new(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new(ClaimTypes.Email, user.Email ?? string.Empty)
             };
             return claims;
         }
@@ -68,11 +68,14 @@ public class TokenService: ITokenService
 
     private SigningCredentials CreateSigningCredentials()
     {
+        var appSecurityKey = _configuration.GetValue<string>("AppSecurityKey");
+        if (appSecurityKey == null)
+        {
+            throw new ArgumentNullException(nameof(appSecurityKey));
+        }
+
         return new SigningCredentials(
-            new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSecurityKey"))
-            ),
-            SecurityAlgorithms.HmacSha256
-        );
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSecurityKey)),
+            SecurityAlgorithms.HmacSha256);
     }
 }

@@ -4,7 +4,7 @@ using IUnitOfWorkFactory = FinanceManager.UnitOfWork.EntityFramework.Abstracts.I
 
 namespace FinanceManager.UnitOfWork.EntityFramework;
 
-internal class UnitOfWorkFactory : IUnitOfWorkFactory
+internal class UnitOfWorkFactory : IUnitOfWorkFactory, IAsyncDisposable, IDisposable
 {
     private readonly IServiceProvider _serviceProvider;
     private IUnitOfWork? _unitOfWork;
@@ -22,5 +22,38 @@ internal class UnitOfWorkFactory : IUnitOfWorkFactory
         }
 
         return _unitOfWork;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _unitOfWork?.Dispose();
+        }
+    }
+
+    ~UnitOfWorkFactory()
+    {
+        Dispose(false);
+    }
+
+    private async ValueTask DisposeAsyncCore()
+    {
+        if (_unitOfWork != null)
+        {
+            await _unitOfWork.DisposeAsync();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        GC.SuppressFinalize(this);
     }
 }

@@ -61,7 +61,7 @@ public class AccountLimitService : IAccountLimitService
         var existed = (await _accountLimitRepository.GetAsync(new AccountLimitSpecification(id: id))).FirstOrDefault();
         if (existed == null)
         {
-            _logger.LogWarning("AccountLimit with id {d} is not found", id);
+            _logger.LogWarning("AccountLimit with id {Id} is not found", id);
             return false;
         }
 
@@ -76,7 +76,7 @@ public class AccountLimitService : IAccountLimitService
         var existed = (await _accountLimitRepository.GetAsync(new AccountLimitSpecification(id: id))).FirstOrDefault();
         if (existed == null)
         {
-            _logger.LogWarning("AccountLimit with id {d} is not found", id);
+            _logger.LogWarning("AccountLimit with id {Id} is not found", id);
             return false;
         }
 

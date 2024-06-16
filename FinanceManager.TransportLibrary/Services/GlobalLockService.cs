@@ -19,20 +19,23 @@ namespace FinanceManager.TransportLibrary.Services;
       public T Value { get; private set; }
     }
 
-    private RefCounted<SemaphoreSlim> GetOrCreate(string key)
+    private static RefCounted<SemaphoreSlim> GetOrCreate(string key)
     {
       return GlobalLockers.AddOrUpdate(key
         , new RefCounted<SemaphoreSlim>(new SemaphoreSlim(1, 1))
         , (_, v) => { v.RefCount++; return v; });
     }
 
-    private RefCounted<SemaphoreSlim> CreateOrNull(string key)
+    private static RefCounted<SemaphoreSlim>? CreateOrNull(string key)
     {
       var item = new RefCounted<SemaphoreSlim>(new SemaphoreSlim(1, 1));
       lock (GlobalLockers)
       {
         if (GlobalLockers.TryAdd(key, item))
+        {
           return item;
+        }
+
         return null;
       }
     }
@@ -47,28 +50,23 @@ namespace FinanceManager.TransportLibrary.Services;
     public IRedLock CreateLock(string resource, TimeSpan expiryTime)
     {
       var refs = CreateOrNull(resource);
-      refs.Value.Wait(expiryTime);
+      refs?.Value.Wait(expiryTime);
+      return new Releaser(resource, GlobalLockers);
+    }
+    public IRedLock CreateLock(string resource, TimeSpan expiryTime, TimeSpan waitTime, TimeSpan retryTime, CancellationToken? cancellationToken = null)
+    {
+      var refs = GetOrCreate(resource);
+      refs.Value.Wait(waitTime);
       return new Releaser(resource, GlobalLockers);
     }
 
     public async Task<IRedLock> CreateLockAsync(string resource, TimeSpan expiryTime)
     {
       var refs = CreateOrNull(resource);
-      await refs.Value.WaitAsync(expiryTime).ConfigureAwait(false);
-      return new Releaser(resource, GlobalLockers);
-    }
-
-    public Task ReleaseLock(string key)
-    {
-      var refs = GetOrCreate(key);
-      refs.Value.Release();
-      return Task.CompletedTask;
-    }
-
-    public IRedLock CreateLock(string resource, TimeSpan expiryTime, TimeSpan waitTime, TimeSpan retryTime, CancellationToken? cancellationToken = null)
-    {
-      var refs = GetOrCreate(resource);
-      refs.Value.Wait(waitTime);
+      if (refs != null)
+      {
+        await refs.Value.WaitAsync(expiryTime).ConfigureAwait(false);        
+      }
       return new Releaser(resource, GlobalLockers);
     }
 
@@ -77,6 +75,13 @@ namespace FinanceManager.TransportLibrary.Services;
       var refs = GetOrCreate(resource);
       await refs.Value.WaitAsync(waitTime).ConfigureAwait(false);
       return new Releaser(resource, GlobalLockers);
+    }
+
+    public Task ReleaseLock(string key)
+    {
+      var refs = GetOrCreate(key);
+      refs.Value.Release();
+      return Task.CompletedTask;
     }
 
     private sealed class Releaser : IRedLock
@@ -104,7 +109,7 @@ namespace FinanceManager.TransportLibrary.Services;
 
       public void Dispose()
       {
-        if (_lockers.TryGetValue(Key, out RefCounted<SemaphoreSlim> item))
+        if (_lockers.TryGetValue(Key, out var item))
         {
           --item.RefCount;
           if (item.RefCount <= 0)
@@ -117,7 +122,7 @@ namespace FinanceManager.TransportLibrary.Services;
 
       public ValueTask DisposeAsync()
       {
-        if (_lockers.TryGetValue(Key, out RefCounted<SemaphoreSlim> item))
+        if (_lockers.TryGetValue(Key, out var item))
         {
           --item.RefCount;
           if (item.RefCount <= 0)

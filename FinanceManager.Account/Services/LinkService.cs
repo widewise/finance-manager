@@ -25,7 +25,7 @@ public class LinkService : ILinkService
     {
         if (_httpContextAccessor.HttpContext == null)
         {
-            throw new NullReferenceException(nameof(_httpContextAccessor.HttpContext));
+            throw new ArgumentNullException(nameof(_httpContextAccessor.HttpContext));
         }
 
         var href = _linkGenerator.GetUriByName(_httpContextAccessor.HttpContext, endpointName, routeValues);

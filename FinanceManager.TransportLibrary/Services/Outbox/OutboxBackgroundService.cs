@@ -23,14 +23,17 @@ public class OutboxBackgroundService: BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation($"{nameof(OutboxBackgroundService)} is started");
+        _logger.LogInformation("{ServiceName} is started", nameof(OutboxBackgroundService));
         while (!stoppingToken.IsCancellationRequested)
         {
             var getWaitTimeService = _serviceProvider.GetRequiredService<IGetWaitTimeForNextOutboxCallService>();
 
             var waitTime = getWaitTimeService.GetWaitTime();
             _logger.LogInformation(
-                $"Outbox trigger will be started in {waitTime.Days} days, {waitTime.Hours} hours, {waitTime.Minutes} minutes");
+                "Outbox trigger will be started in {Days} days, {Hours} hours, {Minutes} minutes",
+                waitTime.Days,
+                waitTime.Hours,
+                waitTime.Minutes);
             await Task.Delay(waitTime, stoppingToken);
             if (stoppingToken.IsCancellationRequested)
             {
@@ -38,7 +41,7 @@ public class OutboxBackgroundService: BackgroundService
             }
             await DoWorkAsync();
         }
-        _logger.LogInformation($"{nameof(OutboxBackgroundService)} is stopped");
+        _logger.LogInformation("{ServiceName} is stopped", nameof(OutboxBackgroundService));
     }
 
     private async Task DoWorkAsync()
@@ -49,14 +52,14 @@ public class OutboxBackgroundService: BackgroundService
             var settings = scope.ServiceProvider.GetRequiredService<OutboxSettings>();
             if (!settings.Enabled)
             {
-                _logger.LogInformation($"{nameof(OutboxBackgroundService)} is turned off");
+                _logger.LogInformation("{ServiceName} is turned off", nameof(OutboxBackgroundService));
             }
             var distributedLock = scope.ServiceProvider.GetRequiredService<IDistributedLockFactory>();
             await using var locker = await distributedLock.CreateLockAsync(LockKey, LockTimeout);
             if (!locker.IsAcquired)
             {
                 _logger.LogInformation(
-                    $"{nameof(OutboxBackgroundService)} execution has already started by another instance");
+                    "{ServiceName} execution has already started by another instance", nameof(OutboxBackgroundService));
                 return;
             }
 

@@ -43,7 +43,7 @@ builder.Services.ConfigureOptions<NamedSwaggerGenOptions<Program>>();
 var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (dbConnectionString == null)
 {
-    throw new Exception("Connection string to DB is null");
+    throw new ArgumentException("Connection string to DB is null");
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -97,7 +97,7 @@ builder.Services
 var apiSecurityKey = builder.Configuration.GetValue<string>("AppSecurityKey");
 if (string.IsNullOrEmpty(apiSecurityKey))
 {
-    throw new Exception("API security key is null or empty");
+    throw new ArgumentException("API security key is null or empty");
 }
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -134,11 +134,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        foreach (var description in provider.ApiVersionDescriptions)
+        foreach (var groupName in provider.ApiVersionDescriptions.Select(x => x.GroupName))
         {
             options.SwaggerEndpoint(
-                $"/swagger/{description.GroupName}/swagger.json",
-                $"v{description.GroupName.ToUpperInvariant()}");
+                $"/swagger/{groupName}/swagger.json",
+                $"v{groupName.ToUpperInvariant()}");
         }
     });
 }

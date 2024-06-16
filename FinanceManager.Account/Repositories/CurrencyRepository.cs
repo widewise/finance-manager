@@ -17,8 +17,6 @@ public interface ICurrencyRepository : IUnitOfWorkRepository
 
 public class CurrencySpecification
 {
-    public CurrencySpecification() { }
-
     public CurrencySpecification(
         Guid? id = null,
         long? userId = null,

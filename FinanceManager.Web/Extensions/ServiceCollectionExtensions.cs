@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
         var section = configuration.GetSection(CustomAuthenticationSettings.SectionName);
         if (section == null)
         {
-            throw new Exception($"Can't find section {CustomAuthenticationSettings.SectionName}");
+            throw new ArgumentException($"Can't find section {CustomAuthenticationSettings.SectionName}");
         }
 
         section.Bind(settings);

@@ -17,6 +17,19 @@ public class UnitOfWorkExecuter : IUnitOfWorkExecuter
         _dbContext = dbContext;
     }
 
+    public void Execute<TRepository>(
+        Action<TRepository> callRepositoryAction)
+        where TRepository : IUnitOfWorkRepository
+    {
+        Execute(unitOfWork =>
+        {
+            var repository = unitOfWork.Repository<TRepository>();
+
+            callRepositoryAction(repository);
+            return 0;
+        });
+    }
+
     public TResult Execute<TResult>(Func<IUnitOfWork, TResult> callRepositoryAction)
     {
         using var unitOfWork = _unitOfWorkFactory.CreateUnitOfWork(_dbContext);
@@ -33,32 +46,13 @@ public class UnitOfWorkExecuter : IUnitOfWorkExecuter
         }
     }
 
-    public async Task<TResult> ExecuteAsync<TResult>(Func<IUnitOfWork, Task<TResult>> callRepositoryAction)
-    {
-        await using var unitOfWork = _unitOfWorkFactory.CreateUnitOfWork(_dbContext);
-        try
-        {
-            var result = await callRepositoryAction(unitOfWork);
-            await unitOfWork.CommitAsync();
-            return result;
-        }
-        catch
-        {
-            await unitOfWork.RollbackAsync();
-            throw;
-        }
-    }
-
-    public void Execute<TRepository>(
-        Action<TRepository> callRepositoryAction)
+    public TResult Execute<TRepository, TResult>(Func<TRepository, TResult> callRepositoryFunc)
         where TRepository : IUnitOfWorkRepository
     {
-        Execute(unitOfWork =>
+        return Execute<TResult>(unitOfWork =>
         {
             var repository = unitOfWork.Repository<TRepository>();
-
-            callRepositoryAction(repository);
-            return 0;
+            return callRepositoryFunc(repository);
         });
     }
 
@@ -73,15 +67,20 @@ public class UnitOfWorkExecuter : IUnitOfWorkExecuter
         });
     }
 
-    public TResult Execute<TRepository, TResult>(
-        Func<TRepository, TResult> callRepositoryFunc)
-        where TRepository : IUnitOfWorkRepository
+    public async Task<TResult> ExecuteAsync<TResult>(Func<IUnitOfWork, Task<TResult>> callRepositoryAction)
     {
-        return Execute<TResult>(unitOfWork =>
+        await using var unitOfWork = _unitOfWorkFactory.CreateUnitOfWork(_dbContext);
+        try
         {
-            var repository = unitOfWork.Repository<TRepository>();
-            return callRepositoryFunc(repository);
-        });
+            var result = await callRepositoryAction(unitOfWork);
+            await unitOfWork.CommitAsync();
+            return result;
+        }
+        catch
+        {
+            await unitOfWork.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<TResult> ExecuteAsync<TRepository, TResult>(Func<TRepository, Task<TResult>> callRepositoryFunc) where TRepository : IUnitOfWorkRepository

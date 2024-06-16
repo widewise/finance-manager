@@ -15,7 +15,7 @@ public interface IAccountBalanceService
 
 public class AccountBalanceService : IAccountBalanceService
 {
-    private readonly ILogger<AccountService> _logger;
+    private readonly ILogger<AccountBalanceService> _logger;
     private readonly IAccountRepository _accountRepository;
     private readonly IAccountLimitRepository _accountLimitRepository;
     private readonly IUnitOfWorkExecuter _unitOfWorkExecuter;
@@ -23,7 +23,7 @@ public class AccountBalanceService : IAccountBalanceService
     private readonly IMessagePublisher<ChangeStatisticsEvent> _changeStatisticsPublisher;
 
     public AccountBalanceService(
-        ILogger<AccountService> logger,
+        ILogger<AccountBalanceService> logger,
         IAccountRepository accountRepository,
         IAccountLimitRepository accountLimitRepository,
         IUnitOfWorkExecuter unitOfWorkExecuter,

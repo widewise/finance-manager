@@ -18,7 +18,7 @@ public class ExportDataBackgroundService: BackgroundService
     }
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation($"{nameof(ExportDataBackgroundService)} is started");
+        _logger.LogInformation("{ServiceName} is started", nameof(ExportDataBackgroundService));
         while (!stoppingToken.IsCancellationRequested)
         {
             //TODO: exclude to config
@@ -29,7 +29,7 @@ public class ExportDataBackgroundService: BackgroundService
             }
             await DoWorkAsync();
         }
-        _logger.LogInformation($"{nameof(ExportDataBackgroundService)} is stopped");
+        _logger.LogInformation("{ServiceName} is stopped", nameof(ExportDataBackgroundService));
     }
 
     private async Task DoWorkAsync()
@@ -42,7 +42,7 @@ public class ExportDataBackgroundService: BackgroundService
             if (!locker.IsAcquired)
             {
                 _logger.LogInformation(
-                    $"{nameof(ExportDataBackgroundService)} execution has already started by another instance");
+                    "{ServiceName} execution has already started by another instance", nameof(ExportDataBackgroundService));
                 return;
             }
 

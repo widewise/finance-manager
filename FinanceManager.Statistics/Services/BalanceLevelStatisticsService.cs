@@ -34,7 +34,7 @@ public class BalanceLevelStatisticsService: IBalanceLevelStatisticsService
             .ToArrayAsync();
     }
 
-    public async Task UpdateStatisticsAsync(Guid accountId, decimal value, DateTime date)
+    public async Task UpdateStatisticsAsync(Guid accountId, decimal balance, DateTime date)
     {
         try
         {
@@ -42,7 +42,7 @@ public class BalanceLevelStatisticsService: IBalanceLevelStatisticsService
                 x => x.AccountId == accountId && x.Date == date);
             if (statistics != null)
             {
-                statistics.Balance += value;
+                statistics.Balance += balance;
                 _appDbContext.BalanceLevelStatistics.Update(statistics);
             }
             else
@@ -51,7 +51,7 @@ public class BalanceLevelStatisticsService: IBalanceLevelStatisticsService
                 {
                     Id = Guid.NewGuid(),
                     AccountId = accountId,
-                    Balance = value,
+                    Balance = balance,
                     Date = date
                 });
             }

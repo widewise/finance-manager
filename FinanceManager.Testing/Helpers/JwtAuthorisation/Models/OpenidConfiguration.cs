@@ -35,7 +35,8 @@ public class OpenidConfiguration
     [JsonProperty("token_endpoint_auth_methods_supported")]
     public List<string>? TokenEndpointAuthMethodsSupported { get; set; }
     [JsonProperty("claims_supported")]
-    public List<string> ClaimsSupported { get; set; }
+    public List<string> ClaimsSupported { get; set; } = null!;
+
     [JsonProperty("claims_parameter_supported")]
     public bool ClaimsParameterSupported { get; set; }
     [JsonProperty("scopes_supported")]
@@ -58,5 +59,5 @@ public class OpenidConfiguration
     public bool BackchannelLogoutSessionSupported { get; set; }
     
     [JsonProperty("introspection_endpoint")]
-    public string IntrospectionEndpoint { get; set; }
+    public string IntrospectionEndpoint { get; set; } = null!;
 }

@@ -2,9 +2,6 @@
 using Asp.Versioning;
 using FinanceManager.Account.Models;
 using FinanceManager.Account.Services;
-using FinanceManager.TransportLibrary;
-using FinanceManager.TransportLibrary.Extensions;
-using FinanceManager.TransportLibrary.Services;
 using FinanceManager.Web;
 using FinanceManager.Web.Extensions;
 using FinanceManager.Web.Services;
@@ -37,8 +34,8 @@ public class AccountController : BaseController
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         return Ok(await _accountService.GetAsync(new AccountQueryParameters
@@ -74,8 +71,8 @@ public class AccountController : BaseController
     {
         if (!HttpContext.HasUserId(out var currentUserId))
         {
-            _logger.LogInformation("The current user identifier is not set");
-            return BadRequest("The current user identifier is not set");
+            _logger.LogInformation(MessageConstants.CurrentUserMessageIsNotSetMessage);
+            return BadRequest(MessageConstants.CurrentUserMessageIsNotSetMessage);
         }
 
         return Ok(await _accountService.CreateAsync(model, currentUserId, requestId));

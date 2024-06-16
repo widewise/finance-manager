@@ -23,8 +23,6 @@ public interface IAccountLimitRepository : IUnitOfWorkRepository
 
 public class AccountLimitSpecification
 {
-    public AccountLimitSpecification() { }
-
     public AccountLimitSpecification(
         Guid? id = null,
         Guid? accountId = null,

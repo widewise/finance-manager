@@ -95,7 +95,7 @@ internal class RestServiceClient : IRestServiceClient
             () => _httpClient.DeleteAsync(uri.AbsoluteUri, _authorization, resolverRequestId, apiKey));
     }
 
-    private string ResolverRequestId(string? requestId)
+    private static string ResolverRequestId(string? requestId)
     {
         if (!string.IsNullOrWhiteSpace(requestId))
         {
@@ -136,7 +136,7 @@ internal class RestServiceClient : IRestServiceClient
         return httpResponse;
     }
 
-    private async Task<TResponse> DeserializeAsync<TResponse>(HttpContent httpContent)
+    private static async Task<TResponse> DeserializeAsync<TResponse>(HttpContent httpContent)
     {
         var serializer = new JsonSerializer();
         Stream? stream = null;
@@ -146,7 +146,7 @@ internal class RestServiceClient : IRestServiceClient
             using var streamReader = new StreamReader(stream);
             using var reader = new JsonTextReader(streamReader);
             var customizationModel = serializer.Deserialize<TResponse>(reader);
-            return customizationModel;
+            return customizationModel!;
         }
         finally
         {

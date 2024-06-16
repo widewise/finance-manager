@@ -25,7 +25,7 @@ public class MessagePublisher<TMessage> : IMessagePublisher<TMessage>, IMessageP
 
     public Task SendAsync(TMessage message)
     {
-        return InternalSendAsync(message);
+        return InternalSendAsync(message!);
     }
 
     public Task SendAsync(object message)

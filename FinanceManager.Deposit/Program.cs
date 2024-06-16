@@ -97,11 +97,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        foreach (var description in provider.ApiVersionDescriptions)
+        foreach (var groupName in provider.ApiVersionDescriptions.Select(x => x.GroupName))
         {
             options.SwaggerEndpoint(
-                $"/swagger/{description.GroupName}/swagger.json",
-                $"v{description.GroupName.ToUpperInvariant()}");
+                $"/swagger/{groupName}/swagger.json",
+                $"v{groupName.ToUpperInvariant()}");
         }
     });
 }

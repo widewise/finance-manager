@@ -109,7 +109,7 @@ public class AccountService : IAccountService
         var existed = (await _accountRepository.GetAsync(new AccountSpecification(id: id))).FirstOrDefault();
         if (existed == null)
         {
-            _logger.LogWarning("Account with id {d} is not found", id);
+            _logger.LogWarning("Account with id {Id} is not found", id);
             return false;
         }
 
@@ -128,7 +128,7 @@ public class AccountService : IAccountService
         var existed = (await _accountRepository.GetAsync(new AccountSpecification(id: id))).FirstOrDefault();
         if (existed == null)
         {
-            _logger.LogWarning("Account with id {d} is not found", id);
+            _logger.LogWarning("Account with id {Id} is not found", id);
             return false;
         }
 

@@ -107,7 +107,7 @@ public class CurrencyService: ICurrencyService
         var existed = (await _currencyRepository.GetAsync(new CurrencySpecification(id: id))).FirstOrDefault();
         if (existed == null)
         {
-            _logger.LogWarning("Category with id {d} is not found", id);
+            _logger.LogWarning("Category with id {Id} is not found", id);
             return false;
         }
 

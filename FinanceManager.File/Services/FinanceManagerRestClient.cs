@@ -238,12 +238,12 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
                     });
             });
 
-        if (result == null)
+        if (EqualityComparer<TResponse?>.Default.Equals(result, default))
         {
             throw new WebException("No content");
         }
 
-        return result;
+        return result!;
     }
 
     private async Task InternalExecuteAsync(
@@ -291,7 +291,7 @@ public class FinanceManagerRestClient : IFinanceManagerRestClient
             var requestParameters = string.Join("\t\n", restRequest.Parameters.Select((Func<Parameter, string>)(
                 x => $"{x.Name}({x.Type}) = {x.Value}")));
             var message = $"Request took {stopwatch.ElapsedMilliseconds}ms to complete. \nRequest Resource: {restRequest.Resource}\nRequest Body: {requestBody}\nRequest Parameters: {requestParameters}";
-          _logger.LogError(message);
+          _logger.LogError("{Message}", message);
           throw restResponse.ErrorException ??
                 (Exception) new WebException($"{restResponse.StatusCode}: {restResponse.Content}\n Request Details: \n {message}");
         }

@@ -143,7 +143,7 @@ public class ExpenseService : IExpenseService
         var existed = await _appDbContext.Expenses.FirstOrDefaultAsync(x => x.Id == id);
         if (existed == null)
         {
-            _logger.LogWarning("Expense with id {d} is not found", id);
+            _logger.LogWarning("Expense with id {Id} is not found", id);
             return false;
         }
 
@@ -177,7 +177,7 @@ public class ExpenseService : IExpenseService
         var existed = await _appDbContext.Expenses.FirstOrDefaultAsync(x => x.Id == id);
         if (existed == null)
         {
-            _logger.LogWarning("Expense with id {d} is not found", id);
+            _logger.LogWarning("Expense with id {Id} is not found", id);
             return false;
         }
 
