@@ -54,7 +54,6 @@ builder.Services.AddTransportConsumer<ChangeStatisticsEvent, ChangeStatisticsCon
     EventConstants.ChangeStatisticsEvent);
 
 var app = builder.Build();
-app.Services.BuildTransportMap();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("DB connection string: {DBConnectionString}", dbConnectionString);
@@ -72,6 +71,8 @@ if (dbConnectionString != null)
 
     logger.LogInformation("DB migrated");
 }
+
+app.Services.BuildTransportMap();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -90,6 +90,9 @@ if (dbConnectionString != null)
 
     logger.LogInformation("DB migrated");
 }
+
+app.Services.BuildTransportMap();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
