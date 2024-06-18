@@ -68,7 +68,7 @@ if (dbConnectionString != null)
         .GetRequiredService<AppDbContext>();
 
     // Here is the migration executed
-    dbContext.Database.Migrate();
+    await dbContext.Database.MigrateAsync();
 
     logger.LogInformation("DB migrated");
 }

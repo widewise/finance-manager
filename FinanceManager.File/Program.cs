@@ -107,7 +107,7 @@ if (dbConnectionString != null)
         .GetRequiredService<FileAppDbContext>();
 
     // Here is the migration executed
-    dbContext.Database.Migrate();
+    await dbContext.Database.MigrateAsync();
 
     logger.LogInformation("DB migrated");
 }
