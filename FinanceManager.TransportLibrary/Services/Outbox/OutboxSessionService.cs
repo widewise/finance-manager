@@ -12,6 +12,7 @@ public interface IOutboxSessionService
 
 public class OutboxSessionService : IOutboxSessionService
 {
+    private const int MaxAttemptCount = 3;
     private readonly ILogger<OutboxSessionService> _logger;
     private readonly OutboxSettings _settings;
     private readonly IMessageRepository _messageRepository;
@@ -49,11 +50,19 @@ public class OutboxSessionService : IOutboxSessionService
                 {
                     await publisher.SendAsync(message ?? new object());
                     outboxMessage.ProcessedAt = DateTime.UtcNow;
+                    outboxMessage.Error = string.Empty;
                 }
                 catch (Exception e)
                 {
                     _logger.LogError(e, "Outbox message sending error: {ErrorMessage}", e.Message);
                     outboxMessage.Error = e.Message;
+                    outboxMessage.AttemptCount += 1;
+                    if (outboxMessage.AttemptCount >= MaxAttemptCount)
+                    {
+                        _logger.LogWarning("The maximum number of attempts to send a message with id {Id} via Outbox has been exceeded. Message will be completed",
+                            outboxMessage.Id);
+                        outboxMessage.ProcessedAt = DateTime.UtcNow;
+                    }
                 }
                 finally
                 {

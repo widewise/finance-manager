@@ -33,6 +33,7 @@ public class OutboxDbMigrator : IOutboxDbMigrator
     ""Type""       text                     NOT NULL,
     ""Content""    text                     NOT NULL,
     ""OccuredAt""  timestamp with time zone NOT NULL,
+    ""AttemptCount"" integer                NOT NULL,
     ""ProcessedAt"" timestamp with time zone NULL,
     ""Error""      text                     NULL
 );
