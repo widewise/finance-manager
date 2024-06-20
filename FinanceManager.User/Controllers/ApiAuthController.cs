@@ -15,21 +15,21 @@ public class ApiAuthController : ControllerBase
 {
     private readonly ILogger<ApiAuthController> _logger;
     private readonly UserManager<Models.User> _userManager;
-    private readonly RoleManager<CustomIdentityRole> _roleManager;
     private readonly ITokenService _tokenService;
+    private readonly IUserRoleService _userRoleService;
     private readonly AppDbContext _context;
 
     public ApiAuthController(
         ILogger<ApiAuthController> logger,
         UserManager<Models.User> userManager,
-        RoleManager<CustomIdentityRole> roleManager,
         ITokenService tokenService,
+        IUserRoleService userRoleService,
         AppDbContext context)
     {
         _logger = logger;
         _userManager = userManager;
-        _roleManager = roleManager;
         _tokenService = tokenService;
+        _userRoleService = userRoleService;
         _context = context;
     }
 
@@ -92,28 +92,40 @@ public class ApiAuthController : ControllerBase
             return Unauthorized();
         }
 
-        var userRoles = await _userManager.GetRolesAsync(managedUser);
-        var userClaims = new List<Claim>();
-        foreach (var userRole in userRoles)
-        {
-            var role = await _roleManager.FindByNameAsync(userRole);
-            if (role == null)
-            {
-                continue;
-            }
-            userClaims.AddRange(await _roleManager.GetClaimsAsync(role));
-        }
+        var (userRoles, userClaims) = await _userRoleService.GetRolesAndClaimsAsync(managedUser);
 
         var accessToken = _tokenService.CreateToken(
             userInDb,
             userRoles.ToArray(),
             userClaims.DistinctBy(x => x.Value).ToArray());
+        var refreshToken = _tokenService.GenerateRefreshToken();
+
+        userInDb.RefreshToken = refreshToken;
+        userInDb.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(TokenConstants.RefreshTokenExpirationHours);
+        
         await _context.SaveChangesAsync();
         return Ok(new AuthResponseModel
         {
             Username = userInDb.UserName,
             Email = userInDb.Email,
-            Token = accessToken
+            Token = accessToken,
+            RefreshToken = refreshToken
         });
+    }
+
+    [HttpGet("verifySecurityStamp")]
+    public async Task<IActionResult> VerifySecurityStamp(
+        [FromQuery] string userName,
+        [FromQuery] string securityStamp)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var currentSecurityStamp = await _userManager.GetSecurityStampAsync(user);
+
+        return Ok(currentSecurityStamp == securityStamp);
     }
 }

@@ -33,6 +33,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddTransient<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddIdentity<User, CustomIdentityRole>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
@@ -77,6 +78,7 @@ builder.Services
     .AddInMemoryApiResources(Resources.GetApiResources())
     .AddInMemoryApiScopes(Resources.GetApiScopes())
     .AddDeveloperSigningCredential();
+
 var apiSecurityKey = builder.Configuration.GetValue<string>("AppSecurityKey");
 if (string.IsNullOrEmpty(apiSecurityKey))
 {
@@ -103,18 +105,34 @@ builder.Services
             OnTokenValidated = async context =>
             {
                 var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
-                var user = await userManager.GetUserAsync(context.Principal!);
-                if (user != null)
+                var userName = context.Principal?.Identity?.Name;
+                if (userName != null)
                 {
-                    var securityStamp = context.Principal.FindFirstValue("AspNet.Identity.SecurityStamp");
-                    if (securityStamp != user.SecurityStamp)
+                    var user = await userManager.FindByNameAsync(userName);
+                    if (user != null)
                     {
-                        context.Fail("Token security stamp mismatch");
+                        var securityStamp = context.Principal?.FindFirstValue("AspNet.Identity.SecurityStamp");
+                        if (securityStamp != user.SecurityStamp)
+                        {
+                            context.Fail("Token security stamp mismatch");
+                        }
                     }
                 }
             }
         };
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AuthPolicies.RequireAdmin, policy => policy.RequireRole(UserRole.Admin.DisplayName()));
+    options.AddPolicy(AuthPolicies.RequireUser, policy => policy.RequireRole(UserRole.User.DisplayName()));
+    options.AddPolicy(AuthPolicies.RequireCategoryRead, policy => policy.RequireClaim(AuthClaimTypes.Permission, AuthClaims.CategoryRead));
+    options.AddPolicy(AuthPolicies.RequireCategoryWrite, policy => policy.RequireClaim(AuthClaimTypes.Permission, AuthClaims.CategoryWrite));
+    options.AddPolicy(AuthPolicies.RequireCurrencyRead, policy => policy.RequireClaim(AuthClaimTypes.Permission, AuthClaims.CurrencyRead));
+    options.AddPolicy(AuthPolicies.RequireCurrencyWrite, policy => policy.RequireClaim(AuthClaimTypes.Permission, AuthClaims.CurrencyWrite));
+});
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 builder.Services.AddApiVersioning(options =>
@@ -136,6 +154,8 @@ builder.Services.AddSwaggerWithAuthentication("User API");
 builder.Services.ConfigureOptions<NamedSwaggerGenOptions<Program>>();
 
 var app = builder.Build();
+
+app.UseMiddleware<AuditLogMiddleware>();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("DB connection string: {DBConnectionString}", dbConnectionString);

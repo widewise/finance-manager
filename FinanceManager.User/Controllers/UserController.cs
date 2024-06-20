@@ -1,13 +1,14 @@
 ﻿using Asp.Versioning;
 using FinanceManager.User.Models;
 using FinanceManager.Web.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManager.User.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [ApiVersion(1.0)]
 [Route("api/v{v:apiVersion}/users")]
@@ -15,13 +16,16 @@ public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> _logger;
     private readonly UserManager<Models.User> _userManager;
+    private readonly SignInManager<Models.User> _signInManager;
 
     public UserController(
         ILogger<UserController> logger,
-        UserManager<Models.User> userManager)
+        UserManager<Models.User> userManager,
+        SignInManager<Models.User> signInManager)
     {
         _logger = logger;
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     [HttpGet("{userId}")]
@@ -68,7 +72,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> CreateUser([FromBody] UserModel createUser)
     {
         var result = await _userManager.CreateAsync(
@@ -81,7 +85,7 @@ public class UserController : ControllerBase
                 LastName = createUser.LastName
             });
 
-        if (result.Succeeded) return Ok();
+        if (result.Succeeded) return NoContent();
 
         var error = string.Join(";", result.Errors.Select(x => $"{x.Code}:{x.Description}"));
         _logger.LogError("Create user error: {Error}", error);
@@ -89,7 +93,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("{userId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateUser([FromBody] UserModel user)
     {
@@ -112,15 +116,21 @@ public class UserController : ControllerBase
         existedUser.Email = user.Email;
         existedUser.Phone = user.Phone;
         var result = await _userManager.UpdateAsync(existedUser);
-        if (result.Succeeded) return Ok();
+        if (!result.Succeeded)
+        {
+            var error = string.Join(";", result.Errors.Select(x => $"{x.Code}:{x.Description}"));
+            _logger.LogError("Update user error: {Error}", error);
+            return BadRequest($"Update user error: {error}");
+        }
 
-        var error = string.Join(";", result.Errors.Select(x => $"{x.Code}:{x.Description}"));
-        _logger.LogError("Update user error: {Error}", error);
-        return BadRequest($"Update user error: {error}");
+        await _userManager.UpdateSecurityStampAsync(existedUser);
+        await _signInManager.RefreshSignInAsync(existedUser);
+
+        return NoContent();
     }
 
     [HttpDelete("{userId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteUser([FromRoute] long userId)
     {
@@ -132,10 +142,15 @@ public class UserController : ControllerBase
         }
 
         var result = await _userManager.DeleteAsync(existedUser);
-        if (result.Succeeded) return Ok();
+        if (!result.Succeeded)
+        {
+            var error = string.Join(";", result.Errors.Select(x => $"{x.Code}:{x.Description}"));
+            _logger.LogError("Delete user error: {Error}", error);
+            return BadRequest($"Delete user error: {error}");
+        }
 
-        var error = string.Join(";", result.Errors.Select(x => $"{x.Code}:{x.Description}"));
-        _logger.LogError("Delete user error: {Error}", error);
-        return BadRequest($"Delete user error: {error}");
+        await _signInManager.RefreshSignInAsync(existedUser);
+
+        return NoContent();
     }
 }

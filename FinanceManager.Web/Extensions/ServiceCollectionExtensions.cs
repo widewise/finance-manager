@@ -4,7 +4,6 @@ using System.Text;
 using FinanceManager.Web.Models;
 using FinanceManager.Web.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -31,10 +30,9 @@ public static class ServiceCollectionExtensions
 
         section.Bind(settings);
 
-        services.Configure<SecurityStampValidatorOptions>(options =>
-        {
-            options.ValidationInterval = TimeSpan.FromSeconds(10);
-        });
+        services.AddHttpClient<IIdentitySecurityStampValidator, IdentitySecurityStampValidator>(
+            "IdentityAPI",
+                client => client.BaseAddress = new Uri(settings.IdentityUrl));
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -52,10 +50,13 @@ public static class ServiceCollectionExtensions
                 {
                     OnTokenValidated = async context =>
                     {
-                        var securityStamp = context.Principal.FindFirstValue("AspNet.Identity.SecurityStamp");
-                        if (string.IsNullOrEmpty(securityStamp))
+                        var userName = context.Principal?.Identity?.Name;
+                        var securityStamp = context.Principal?.FindFirstValue("AspNet.Identity.SecurityStamp");
+                        var securityStampValidator = context.HttpContext.RequestServices.GetRequiredService<IIdentitySecurityStampValidator>();
+                        var result = await securityStampValidator.ValidateAsync(userName, securityStamp);
+                        if (!result.Result)
                         {
-                            context.Fail("Token security stamp mismatch");
+                            context.Fail(result.Message);
                         }
                     }
                 };
