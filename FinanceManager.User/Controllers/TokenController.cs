@@ -1,9 +1,6 @@
 ﻿using Asp.Versioning;
 using FinanceManager.User.Models;
 using FinanceManager.User.Services;
-using FinanceManager.Web.Extensions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,16 +29,20 @@ public class TokenController : ControllerBase
     [Route("refresh")]
     public async Task<IActionResult> Refresh(TokenRefreshRequestModel tokenRefreshRequestModel)
     {
+        if (!_tokenService.ValidateRefreshToken(tokenRefreshRequestModel.RefreshToken))
+        {
+            return BadRequest("Invalid client request");
+        }
+
         var principal = _tokenService.GetPrincipalFromExpiredToken(tokenRefreshRequestModel.AccessToken);
         if (principal.Identity == null)
         {
             return BadRequest("Wrong identity principal value");
         }
+
         var username = principal.Identity.Name;
         var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.UserName == username);
-        if (user is null ||
-            user.RefreshToken != tokenRefreshRequestModel.RefreshToken ||
-            user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        if (user is null)
         {
             return BadRequest("Invalid client request");
         }
@@ -51,37 +52,11 @@ public class TokenController : ControllerBase
         var newAccessToken = _tokenService.CreateToken(user, userRoles.ToArray(), userClaims.ToArray());
         var newRefreshToken = _tokenService.GenerateRefreshToken();
 
-        user.RefreshToken = newRefreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(TokenConstants.RefreshTokenExpirationHours);
-
         await _dbContext.SaveChangesAsync();
         return Ok(new TokenRefreshResponseModel
         {
             AccessToken = newAccessToken,
             RefreshToken = newRefreshToken
         });
-    }
-
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [HttpPost]
-    [Route("revoke")]
-    public async Task<IActionResult> Revoke()
-    {
-        if (!HttpContext.HasUserId(out var userId))
-        {
-            return BadRequest("The current user identifier is not set");
-        }
-
-        var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == userId);
-        if (user == null)
-        {
-            return BadRequest("Invalid client request");
-        }
-
-        user.RefreshToken = null;
-        user.RefreshTokenExpiryTime = null;
-
-        await _dbContext.SaveChangesAsync();
-        return NoContent();
     }
 }
