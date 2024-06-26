@@ -99,9 +99,6 @@ public class ApiAuthController : ControllerBase
             userRoles.ToArray(),
             userClaims.DistinctBy(x => x.Value).ToArray());
         var refreshToken = _tokenService.GenerateRefreshToken();
-
-        userInDb.RefreshToken = refreshToken;
-        userInDb.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(TokenConstants.RefreshTokenExpirationHours);
         
         await _context.SaveChangesAsync();
         return Ok(new AuthResponseModel

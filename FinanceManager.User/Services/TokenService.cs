@@ -1,6 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using FinanceManager.Web;
 using Microsoft.IdentityModel.Tokens;
@@ -12,6 +11,7 @@ public interface ITokenService
     string CreateToken(Models.User user, string[] roles, Claim[] claims);
     string GenerateRefreshToken();
     ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+    bool ValidateRefreshToken(string refreshToken);
 }
 
 public class TokenService : ITokenService
@@ -32,7 +32,7 @@ public class TokenService : ITokenService
         var expiration = DateTime.UtcNow.AddMinutes(TokenConstants.AccessTokenExpirationMinutes);
         var token = CreateJwtToken(
             CreateClaims(user, roles, claims),
-            CreateSigningCredentials(),
+            CreateSigningCredentials(_configuration.GetValue<string>("AppSecurityKey")!),
             expiration
         );
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -41,10 +41,12 @@ public class TokenService : ITokenService
 
     public string GenerateRefreshToken()
     {
-        var randomNumber = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
-        return Convert.ToBase64String(randomNumber);
+        var expiration = DateTime.UtcNow.AddHours(TokenConstants.RefreshTokenExpirationHours);
+        var token = new JwtSecurityToken(
+            expires: expiration,
+            signingCredentials: CreateSigningCredentials(_configuration.GetValue<string>("AppRefreshSecurityKey")!));
+        var tokenHandler = new JwtSecurityTokenHandler();
+        return tokenHandler.WriteToken(token);
     }
 
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
@@ -54,7 +56,7 @@ public class TokenService : ITokenService
             ValidateAudience = false,
             ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = GetSymmetricSecurityKey(),
+            IssuerSigningKey = GetSymmetricSecurityKey(_configuration.GetValue<string>("AppSecurityKey")!),
             ValidateLifetime = false
         };
 
@@ -68,6 +70,37 @@ public class TokenService : ITokenService
         }
             
         return principal;
+    }
+
+    public bool ValidateRefreshToken(string refreshToken)
+    {
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+            ValidateIssuer = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = GetSymmetricSecurityKey(_configuration.GetValue<string>("AppRefreshSecurityKey")!),
+            ValidateLifetime = true
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        try
+        {
+            var principal = tokenHandler.ValidateToken(refreshToken, tokenValidationParameters, out var securityToken);
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+            if (principal == null || jwtSecurityToken == null ||
+                !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return false;
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Refresh token validation error: {ErrorMessage}", e.Message);
+            return false;
+        }
+            
     }
 
     private JwtSecurityToken CreateJwtToken(List<Claim> claims, SigningCredentials credentials,
@@ -103,17 +136,17 @@ public class TokenService : ITokenService
         }
     }
 
-    private SigningCredentials CreateSigningCredentials()
+    private SigningCredentials CreateSigningCredentials(string securityKey)
     {
-        return new SigningCredentials(GetSymmetricSecurityKey(),
-            SecurityAlgorithms.HmacSha256
-        );
+        return new SigningCredentials(
+            GetSymmetricSecurityKey(securityKey),
+            SecurityAlgorithms.HmacSha256);
     }
 
-    private SymmetricSecurityKey GetSymmetricSecurityKey()
+    private SymmetricSecurityKey GetSymmetricSecurityKey(string securityKey)
     {
         return new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSecurityKey")!)
+            Encoding.UTF8.GetBytes(securityKey)
         );
     }
 }
