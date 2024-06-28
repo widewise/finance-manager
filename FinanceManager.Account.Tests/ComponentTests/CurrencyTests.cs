@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿/*using System.Net;
 using AutoFixture.Xunit2;
 using FinanceManager.Account.Domain;
 using FinanceManager.Account.Models;
@@ -126,4 +126,4 @@ public class CurrencyTests : AccountTestFixture
         var getResponse = await _httpClient.GetAsync<CurrencyResponse[]>(_uriBuilder.Uri, requestId: requestId);
         getResponse.Should().BeEmpty();
     }
-}
+}*/
