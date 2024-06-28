@@ -1,0 +1,49 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+    #TODO: create src, common, tests folders 
+    paths:
+     - "FinanceManager.Account/**"
+     - "FinanceManager.Account.Tests/**"
+     - "FinanceManager.Events/**"
+     - "FinanceManager.Testing/**"
+     - "FinanceManager.TransportLibrary/**"
+     - "FinanceManager.UnitOfWork/**"
+     - "FinanceManager.Web/**" 
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "FinanceManager.Account/**"
+      - "FinanceManager.Account.Tests/**"
+      - "FinanceManager.Events/**"
+      - "FinanceManager.Testing/**"
+      - "FinanceManager.TransportLibrary/**"
+      - "FinanceManager.UnitOfWork/**"
+      - "FinanceManager.Web/**"
+
+env:
+  project-file: "./FinanceManager.Account/FinanceManager.Account.csproj"
+  test-project-file: "./FinanceManager.Account.Tests/FinanceManager.Account.Tests.csproj"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 7.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.project-file }}
+
+    - name: Build
+      run: dotnet build --no-restore ${{ env.project-file }}
+
+    - name: Test
+      run: dotnet test --no-build --verbosity normal ${{ test-project-file }}
