@@ -39,6 +39,12 @@ jobs:
       with:
         dotnet-version: 7.0.x
 
+    - name: Install SonarScanner for .NET
+      run: dotnet tool install --global dotnet-sonarscanner
+
+    - name: Run SonarQube Begin Analysis
+      run: dotnet sonarscanner begin /k:"FinanceManager" /d:sonar.host.url="http://localhost:9000" /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+
     - name: Restore dependencies
       run: dotnet restore ${{ env.project-file }}
 
@@ -48,14 +54,5 @@ jobs:
     - name: Test
       run: dotnet test ${{ env.test-project-file }}
 
-    - name: Download Sonar Scanner
-      run: |
-        curl https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.1.0.4477-windows-x64.zip -OutFile sonar-scanner-cli-6.1.0.4477-windows-x64.zip
-
-    - name: Extract Sonar Scanner
-      run: |
-        tar -xf sonar-scanner-cli-6.1.0.4477-windows-x64.zip
-
-    - name: Run SonarQube Scan
-      run: |
-        ./sonar-scanner-6.1.0.4477-windows-x64/bin/sonar-scanner.bat -D"sonar.token=${{ secrets.SONAR_TOKEN }}" -D"sonar.projectKey=FinanceManager" -D"sonar.sources=./FinanceManager.Account" -D"sonar.host.url=http://localhost:9000"
+    - name: Run SonarQube End Analysis
+      run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
