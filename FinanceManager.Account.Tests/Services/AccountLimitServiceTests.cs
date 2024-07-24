@@ -55,7 +55,7 @@ public class AccountLimitServiceTests
         var result = await _service.CreateAsync(model, requestId);
 
         //Assert
-        result.Should().BeNull();
+        result.Should().NotBeNull();
     }
 
     [AutoData, Theory]
